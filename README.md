@@ -14,3 +14,25 @@ Github:
 ```bash
 wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/kill_app.sh && sudo chmod +x ./kill_app.sh && sudo bash ./kill_app.sh
 ```
+
+# linux_limit.sh
+项目介绍：对应文章的快捷Shell脚本 </p>
+使用方法： </p>
+2. 交互模式
+CNB：
+```bash
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh
+```
+Github:
+```bash
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh
+```
+1. 非交互模式
+CNB：
+```bash
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh <原始目录> <大小> <镜像存储路径> 
+```
+Github:
+```bash
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh
+```
