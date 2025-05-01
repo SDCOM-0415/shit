@@ -8,11 +8,11 @@ Github: https://github.com/SDCOM-0415/shit
 使用方法： </p>
 CNB：
 ```bash
-wget https://cnb.cool/SDCOM/shit/-/git/raw/main/kill_app.sh && sudo chmod +x ./kill_app.sh && sudo bash ./kill_app.sh
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/kill_app.sh && sudo chmod +x ./kill_app.sh && sudo ./kill_app.sh
 ```
 Github:
 ```bash
-wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/kill_app.sh && sudo chmod +x ./kill_app.sh && sudo bash ./kill_app.sh
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/kill_app.sh && sudo chmod +x ./kill_app.sh && sudo ./kill_app.sh
 ```
 
 # linux_limit.sh
@@ -21,19 +21,19 @@ wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/kill_app.sh && sudo 
 1.非交互模式 </p>
 CNB：
 ```bash
-wget https://cnb.cool/SDCOM/shit/-/git/raw/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh <原始目录> <大小> <镜像存储路径> 
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo ./linux_limit.sh <原始目录> <大小> <镜像存储路径> 
 ```
 Github:
 ```bash
-wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh <原始目录> <大小> <镜像存储路径> 
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo ./linux_limit.sh <原始目录> <大小> <镜像存储路径> 
 ```
 
 2.交互模式 </p>
 CNB：
 ```bash
-wget https://cnb.cool/SDCOM/shit/-/git/raw/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo ./linux_limit.sh
 ```
 Github:
 ```bash
-wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo bash ./linux_limit.sh
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo ./linux_limit.sh
 ```
