@@ -2,7 +2,9 @@
 
 echo "Kill_app Version: 0.2"
 echo "作者: SDCOM"
-echo "项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/kill_app.sh"
+echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/kill_app.sh"
+echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/kill_app.sh"
+
 
 read -p "请输入要终止的进程名称: " PROCESS_NAME
 
