@@ -1,3 +1,22 @@
+$:
+  vscode:
+  - services:
+    - docker
+    - vscode
+    runner:
+      cpus: 1
+    stages:
+      - name: update dependencies
+        script: apt update
+      - name: install dependencies
+        script: apt install -y sudo
+      - name: install fastfetch
+        script: 
+        - wget https://github.com/fastfetch-cli/fastfetch/releases/download/latest/fastfetch-linux-amd64.deb
+        - dpkg -i fastfetch-linux-amd64.deb
+        - rm fastfetch-linux-amd64.deb
+        - fastfetch
+
 main:
   push: 
     - runner: 
