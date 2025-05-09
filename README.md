@@ -37,3 +37,15 @@ Github:
 ```bash
 wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && sudo chmod +x ./linux_limit.sh && sudo ./linux_limit.sh
 ```
+
+# get_ip.sh
+项目介绍：获取本机IP地址的Shell脚本 </p>
+使用方法： </p>
+CNB：
+```bash
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/get_ip.sh && sudo chmod +x ./get_ip.sh && sudo ./get_ip.sh
+```
+Github:
+```bash
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/get_ip.sh && sudo chmod +x ./get_ip.sh && sudo ./get_ip.sh
+```
