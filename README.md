@@ -39,7 +39,7 @@ wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/linux_limit.sh && su
 ```
 
 # get_ip.sh
-项目介绍：获取本机IP地址的Shell脚本 </p>
+项目介绍：为了在termux获取本机IP地址的Shell脚本 </p>
 使用方法： </p>
 CNB：
 ```bash
