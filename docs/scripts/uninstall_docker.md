@@ -1,6 +1,6 @@
 # uninstall_docker.sh
 
-这是一个用于完全卸载Docker的脚本，测试支持`Debian 12`系统，当前版本`v1.0`。
+这是一个用于完全卸载Docker的脚本，测试支持`Debian 12`系统，当前版本<Badge type="tip" text="v1.0" />。
 
 ## 功能
 

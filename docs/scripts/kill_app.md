@@ -1,5 +1,5 @@
 # kill_app.sh
-这个脚本用于快速结束Linux、macOS系统运行中程序，测试支持`FydeOS Linux子系统` `macOS 10.15.7` `Debian 12`，当前版本v1.0
+这个脚本用于快速结束Linux、macOS系统运行中程序，测试支持`FydeOS Linux子系统` `macOS 10.15.7` `Debian 12`，当前版本<Badge type="tip" text="v1.0" />
 
 ## 功能
 

@@ -53,7 +53,7 @@ export default defineConfig({
       port: 5173,
       strictPort: true,
       // 添加允许的主机
-      allowedHosts: ['f3j688qyk4pp-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app']
+      allowedHosts: ['phcau2blh691-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app']
     }
   }
 })

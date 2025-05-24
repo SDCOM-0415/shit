@@ -1,6 +1,6 @@
 # linux_limit.sh
 
-这是一个用于限制Linux目录大小的脚本，测试支持`Debian 12`，当前版本为`v1.0`。
+这是一个用于限制Linux目录大小的脚本，测试支持`Debian 12`，当前版本为<Badge type="tip" text="v1.0" />。
 
 ## 功能特点
 

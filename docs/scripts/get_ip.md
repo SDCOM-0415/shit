@@ -1,6 +1,6 @@
 # get_ip.sh
 
-这是一个用于在termux中快速获取本机IP地址的脚本，测试支持`termux`，当前版本为v0.1。
+这是一个用于在termux中快速获取本机IP地址的脚本，测试支持`termux`，当前版本为<Badge type="tip" text="v0.1" />。
 
 ## 功能
 
