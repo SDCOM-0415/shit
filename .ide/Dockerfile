@@ -11,9 +11,6 @@ RUN apt-get update && \
 
 RUN npm config set registry https://mirrors.cloud.tencent.com/npm/
 
-COPY ./package.json ./package.json 
-RUN npm install 
-
 # 以及按需安装其他软件
 RUN apt-get update && apt-get install -y git sudo vim curl 
 
