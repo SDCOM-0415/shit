@@ -1,15 +1,21 @@
 {
-  "name": "workspace",
+  "name": "shell-scripts-docs",
   "version": "1.0.0",
-  "description": "就是一个放我写的石的仓库而已 </p> CNB: https://cnb.cool/SDCOM/shit </p> Github: https://github.com/SDCOM-0415/shit",
-  "main": "index.js",
+  "description": "Documentation for shell scripts collection",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "shell",
+    "scripts",
+    "documentation"
+  ],
+  "author": "SDCOM",
+  "license": "MIT",
   "devDependencies": {
-    "vitepress": "^1.6.3"
+    "vitepress": "^1.0.0-rc.31"
   }
 }
