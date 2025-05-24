@@ -1,7 +1,15 @@
 #帮助文档地址: https://docs.cnb.cool/zh/vscode/quick-start.html
-FROM cnbcool/default-dev-env:latest
+FROM node:20
 
 # 腾讯云软件源使用示例: https://cnb.cool/examples/mirrors/mirrors.cloud.tencent.com
+
+RUN sed -i "s@http://deb.debian.org/debian@http://mirrors.cloud.tencent.com/debian@g" /etc/apt/sources.list.d/debian.sources
+
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN npm config set registry https://mirrors.cloud.tencent.com/npm/
 
 # 以及按需安装其他软件
 RUN apt-get update && apt-get install -y git sudo vim curl 
