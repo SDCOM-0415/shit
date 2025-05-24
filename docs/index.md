@@ -10,19 +10,13 @@ hero:
       text: 查看脚本文档
       link: /scripts/
     - theme: alt
+      text: CNB
+      link: https://cnb.cool/SDCOM/shit
+    - theme: alt
       text: GitHub
       link: https://github.com/SDCOM-0415/shit
 
-features:
-  - title: kill_app.sh
-    details: 在FydeOS中快速结束Linux子系统程序的脚本
-  - title: linux_limit.sh
-    details: 目录大小限制相关的脚本，支持交互模式和非交互模式
-  - title: get_ip.sh
-    details: 在termux中获取本机IP地址的脚本
-  - title: 更多工具
-    details: 包含其他实用的系统管理脚本
----
+
 
 # Shell Scripts Collection
 
