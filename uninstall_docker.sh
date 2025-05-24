@@ -2,8 +2,6 @@
 # 完全卸载 Docker 的脚本
 # 适用于 Ubuntu 系统（22.04及以上）
 
-set -e
-
 echo "🛑 正在停止 Docker 服务..."
 sudo systemctl stop docker || true
 
