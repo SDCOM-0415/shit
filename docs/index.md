@@ -15,7 +15,7 @@ hero:
     - theme: alt
       text: GitHub
       link: https://github.com/SDCOM-0415/shit
-
+---
 
 
 # Shell Scripts Collection
