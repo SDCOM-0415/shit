@@ -5,6 +5,7 @@ export default defineConfig({
   title: "Shell脚本文档",
   description: "Shell脚本集合的详细文档",
   themeConfig: {
+    logo: '/image/logo.svg',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
