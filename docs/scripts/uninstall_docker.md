@@ -1,6 +1,6 @@
 # uninstall_docker.sh
 
-这是一个用于完全卸载Docker的脚本，适用于Ubuntu系统（22.04及以上版本）。
+这是一个用于完全卸载Docker的脚本，测试支持`Debian 12`系统，当前版本`v1.0`。
 
 ## 功能
 
@@ -12,9 +12,13 @@
 
 ## 使用方法
 
+CNB：
 ```bash
-chmod +x uninstall_docker.sh
-sudo ./uninstall_docker.sh
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/uninstall_docker.sh && sudo chmod +x ./uninstall_docker.sh && sudo ./uninstall_docker.sh
+```
+Github:
+```bash
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/uninstall_docker.sh && sudo chmod +x ./uninstall_docker.sh && sudo ./uninstall_docker.sh
 ```
 
 注意：此脚本需要使用sudo权限运行，因为它需要执行系统级操作。
@@ -36,7 +40,12 @@ sudo ./uninstall_docker.sh
 ```bash
 #!/bin/bash
 # 完全卸载 Docker 的脚本
-# 适用于 Ubuntu 系统（22.04及以上）
+# 适用于 Debian 12 系统 (其他系统未测试)
+
+echo "Docker Uninstall Script Version: v1.0"
+echo "作者: SDCOM"
+echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/script/uninstall_docker.sh"
+echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/script/uninstall_docker.sh"
 
 echo "🛑 正在停止 Docker 服务..."
 sudo systemctl stop docker || true
@@ -60,6 +69,7 @@ echo "🔄 更新 apt 缓存..."
 sudo apt update
 
 echo "✅ Docker 已彻底卸载完毕，你可以重新安装。"
+
 ```
 
 ## 注意事项
@@ -73,12 +83,3 @@ echo "✅ Docker 已彻底卸载完毕，你可以重新安装。"
 - 执行此脚本前，请确保已备份任何重要的Docker数据
 - 脚本使用`|| true`语法确保即使某些命令失败，整个脚本也会继续执行
 - 此脚本主要针对通过官方方法安装的Docker，如果使用其他方式安装，可能需要额外的清理步骤
-
-## 适用系统
-
-- Ubuntu 22.04 LTS及更高版本
-- 可能适用于其他基于Debian的系统，但未经测试
-
-## 作者
-
-SDCOM

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "Get IP Version: 0.1"
+echo "Get IP Version: v0.1"
 echo "作者: SDCOM"
-echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/get_ip.sh"
-echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/get_ip.sh"
+echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/script/get_ip.sh"
+echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/script/get_ip.sh"
 
 # 脚本功能：获取所有网络接口的IP地址并以指定格式输出
 # 输出格式：网络接口：IP地址

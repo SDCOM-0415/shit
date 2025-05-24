@@ -1,6 +1,11 @@
 #!/bin/bash
 # 完全卸载 Docker 的脚本
-# 适用于 Ubuntu 系统（22.04及以上）
+# 适用于 Debian 12 系统 (其他系统未测试)
+
+echo "Docker Uninstall Script Version: v1.0"
+echo "作者: SDCOM"
+echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/script/uninstall_docker.sh"
+echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/script/uninstall_docker.sh"
 
 echo "🛑 正在停止 Docker 服务..."
 sudo systemctl stop docker || true

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "limit Version: 0.2"
+echo "limit Version: v0.1"
 echo "作者: SDCOM"
-echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/linux_limit.sh"
-echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/linux_limit.sh"
+echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/script/linux_limit.sh"
+echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/script/linux_limit.sh"
 
 # 方法选择
 METHOD=2  # 默认使用fallocate方法
