@@ -17,11 +17,11 @@ hero:
       link: https://github.com/SDCOM-0415/shit
 ---
 
-# Web构建状态
-[![Netlify Status](https://api.netlify.com/api/v1/badges/237be5bf-d8e3-4c5f-afcc-ff571562bc52/deploy-status)](https://app.netlify.com/projects/shit-sdcom/deploys)
-
 # Shell Scripts Collection
 这是一个我写的💩的集合，但是带有一点点实用性
+
+# Web构建状态
+[![Netlify Status](https://api.netlify.com/api/v1/badges/237be5bf-d8e3-4c5f-afcc-ff571562bc52/deploy-status)](https://app.netlify.com/projects/shit-sdcom/deploys)
 
 ## 主要脚本
 
