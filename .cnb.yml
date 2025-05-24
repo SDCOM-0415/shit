@@ -1,21 +1,31 @@
 $:
+# 网页远程开发
   vscode:
   - services:
     - docker
     - vscode
     runner:
       cpus: 1
+    docker:
+      build: .ide/Dockerfile
+    env:
+      CNB_WELCOME_CMD: fastfetch
     stages:
       - name: update dependencies
-        script: apt update
-      - name: install dependencies
-        script: apt install -y sudo
-      - name: install fastfetch
-        script: 
-        - wget https://github.com/fastfetch-cli/fastfetch/releases/download/latest/fastfetch-linux-amd64.deb
-        - dpkg -i fastfetch-linux-amd64.deb
-        - rm fastfetch-linux-amd64.deb
-        - fastfetch
+        script: fastfetch
+
+# VS code打开   
+  api_trigger_cnb_dev_plugin:
+  - services:
+    - docker
+    - vscode
+    docker:
+      build: .ide/Dockerfile
+    env:
+      CNB_WELCOME_CMD: fastfetch
+    stages:
+      - name: update dependencies
+        script: fastfetch
 
 main:
   push: 
