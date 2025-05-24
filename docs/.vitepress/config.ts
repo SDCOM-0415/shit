@@ -4,6 +4,9 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Shell脚本文档",
   description: "Shell脚本集合的详细文档",
+  head: [
+    ['link', { rel: 'icon', href: '/image/favicon.ico' }]
+  ],
   themeConfig: {
     logo: '/image/logo.svg',
     // https://vitepress.dev/reference/default-theme-config
@@ -26,9 +29,21 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/SDCOM-0415/shit' },
-      { icon: 'telegram', link: 'https://t.me/SDCOM_Message_BOT'}
-    ]
+      { icon: 'github', link: 'https://cnb.cool/SDCOM/shit/' },
+      { icon: 'telegram', link: 'https://t.me/SDCOM_Message_BOT/'}
+    ],
+    
+    // 编辑链接配置
+    editLink: {
+      pattern: 'https://cnb.cool/SDCOM/shit/-/edit/main/docs/:path',
+      text: '在CNB编辑'
+    },
+    
+    // 上下页导航配置
+    docFooter: {
+      prev: '上一页',
+      next: '下一页'
+    }
   },
   
   // 修改开发服务器配置
