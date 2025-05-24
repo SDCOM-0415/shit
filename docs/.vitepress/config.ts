@@ -25,7 +25,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: '/icons/cnb.svg', link: 'https://cnb.cool/SDCOM/shit' },
+      { icon: 'vpi-social-cnb', link: 'https://cnb.cool/SDCOM/shit' },
       { icon: 'github', link: 'https://github.com/SDCOM-0415/shit' }
     ]
   },
