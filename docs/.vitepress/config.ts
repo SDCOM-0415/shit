@@ -8,7 +8,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '脚本文档', link: '/scripts/' }
+      { text: '脚本文档', link: '/scripts/'}
     ],
 
     sidebar: [
@@ -25,6 +25,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
+      { icon: '', link: 'https://cnb.cool/SDCOM/shit' },
       { icon: 'github', link: 'https://github.com/SDCOM-0415/shit' }
     ]
   },
