@@ -36,8 +36,10 @@ hero:
 
 ## 项目仓库
 
-https://github.com/SDCOM-0415/shit
+CNB：https://cnb.cool/SDCOM/shit/
+
+Github：https://github.com/SDCOM-0415/shit/
 
 ## © 作者
 
-SDCOM-0415
+SDCOM
