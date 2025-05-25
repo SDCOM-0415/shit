@@ -43,7 +43,7 @@ wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/uninstall_doc
 # 适用于 Debian 12 系统 (其他系统未测试)
 
 echo "Docker Uninstall Script Version: v1.0"
-echo "作者: SDCOM"
+echo "© 作者: SDCOM"
 echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/script/uninstall_docker.sh"
 echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/script/uninstall_docker.sh"
 
@@ -83,3 +83,12 @@ echo "✅ Docker 已彻底卸载完毕，你可以重新安装。"
 - 执行此脚本前，请确保已备份任何重要的Docker数据
 - 脚本使用`|| true`语法确保即使某些命令失败，整个脚本也会继续执行
 - 此脚本主要针对通过官方方法安装的Docker，如果使用其他方式安装，可能需要额外的清理步骤
+
+## 项目仓库
+
+CNB：https://cnb.cool/SDCOM/shit/-/blob/main/script/uninstall_docker.sh
+
+Github：https://github.com/SDCOM-0415/shit/blob/main/script/uninstall_docker.sh
+## © 作者
+
+SDCOM

@@ -59,7 +59,7 @@ wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/linux_limit.sh && sudo ch
 #!/bin/bash
 
 echo "limit Version: v0.1"
-echo "作者: SDCOM"
+echo "© 作者: SDCOM"
 echo "CNB项目地址：https://cnb.cool/SDCOM/shit/-/blob/main/script/linux_limit.sh"
 echo "GitHub项目地址：https://github.com/SDCOM-0415/shit/blob/main/script/linux_limit.sh"
 
@@ -124,3 +124,13 @@ fi
 - 原始数据会被自动备份，备份目录名格式为：`原始目录名_backup_时间戳`
 - 确保系统有足够的空间存储镜像文件
 - 建议在操作前备份重要数据
+
+## 项目仓库
+
+CNB：https://cnb.cool/SDCOM/shit/-/blob/main/script/linux_limit.sh
+
+Github：https://github.com/SDCOM-0415/shit/blob/main/script/linux_limit.sh
+
+## © 作者
+
+SDCOM

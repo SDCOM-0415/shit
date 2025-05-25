@@ -22,3 +22,13 @@ wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.s
 ```
 
 具体的使用方法和参数请参考各个脚本的详细文档。
+
+## 项目仓库
+
+CNB：https://cnb.cool/SDCOM/shit/
+
+Github：https://github.com/SDCOM-0415/shit/
+
+## © 作者
+
+SDCOM

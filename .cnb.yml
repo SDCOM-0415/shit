@@ -9,7 +9,7 @@ $:
     docker:
       build: .ide/Dockerfile
     env:
-      CNB_WELCOME_CMD: fastfetch
+      CNB_WELCOME_CMD: fastfetch && npm install
     stages:
       - name: update dependencies
         script: fastfetch
@@ -26,6 +26,8 @@ $:
     stages:
       - name: update dependencies
         script: fastfetch
+      - name: install npm
+        script: npm install
 
 main:
   push: 

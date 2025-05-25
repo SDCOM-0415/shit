@@ -92,3 +92,13 @@ echo "操作完成"
 - 此脚本使用`kill -9`命令强制终止进程，这可能会导致数据丢失或其他问题
 - 在终止重要进程前，请确保已保存所有工作
 - 在Linux系统中使用此脚本时，可能需要root权限来终止某些系统进程
+
+## 项目仓库
+
+CNB：https://cnb.cool/SDCOM/shit/-/blob/main/script/kill_app.sh
+
+Github：https://github.com/SDCOM-0415/shit/blob/main/script/kill_app.sh
+
+## © 作者
+
+SDCOM

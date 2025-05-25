@@ -73,3 +73,11 @@ exit 0
 - 如果系统中没有安装`ifconfig`命令，脚本会提示安装`net-tools`包
 - 脚本只显示具有IPv4地址的接口，没有IP地址的接口不会显示
 - 此脚本主要设计用于termux环境，但也可以在其他Linux系统中使用
+
+## 项目仓库
+CNB：https://cnb.cool/SDCOM/shit/-/blob/main/script/get_ip.sh
+
+Github：https://github.com/SDCOM-0415/shit/blob/main/script/get_ip.sh
+
+## © 作者
+SDCOM
