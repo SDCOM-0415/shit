@@ -45,7 +45,6 @@ export default defineConfig({
       next: '下一页'
     }
   },
-  
   // 修改开发服务器配置
   vite: {
     server: {
