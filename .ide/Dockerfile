@@ -2,17 +2,14 @@
 FROM node:20
 
 # 腾讯云软件源使用示例: https://cnb.cool/examples/mirrors/mirrors.cloud.tencent.com
-
 RUN sed -i "s@http://deb.debian.org/debian@http://mirrors.cloud.tencent.com/debian@g" /etc/apt/sources.list.d/debian.sources
 
 RUN apt-get update && \
     apt-get install -y git && \
     rm -rf /var/lib/apt/lists/*
 
-RUN npm config set registry https://mirrors.cloud.tencent.com/npm/
-
 # 以及按需安装其他软件
-RUN apt-get update && apt-get install -y git sudo vim curl 
+RUN apt-get update && apt-get install -y git sudo vim curl git-lfs
 
 # 安装 code-server 和 vscode 常用插件
 RUN curl -fsSL https://code-server.dev/install.sh | sh \
@@ -28,6 +25,9 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh \
   && code-server --install-extension waderyan.gitblame \
   && code-server --install-extension donjayamanne.githistory \
   && code-server --install-extension yandeu.five-server \
+  && code-server --install-extension ms-ceintl.vscode-language-pack-zh-hans@1.100.0 \
+  && wget https://cnb.cool/SDCOM/moren/node/-/git/raw/main/.ide/argv.json -O /root/.local/share/code-server/User/argv.json \
+  && wget https://cnb.cool/SDCOM/moren/node/-/git/raw/main/.ide/languagepacks.json -O /root/.local/share/code-server/languagepacks.json \
   && echo done
 
 # 安装 ssh 服务，用于支持 VSCode 客户端通过 Remote-SSH 访问开发环境
