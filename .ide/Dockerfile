@@ -12,7 +12,7 @@ RUN apt-get update && \
 RUN apt-get update && apt-get install -y git sudo vim curl git-lfs
 
 # 安装 code-server 和 vscode 常用插件
-RUN curl -fsSL https://code-server.dev/install.sh | sh \
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version 4.100.3 \
   && code-server --install-extension cnbcool.cnb-welcome \
   && code-server --install-extension redhat.vscode-yaml \
   && code-server --install-extension detachhead.basedpyright \
