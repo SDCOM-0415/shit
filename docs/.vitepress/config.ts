@@ -23,7 +23,10 @@ export default defineConfig({
           { text: 'kill_app.sh', link: '/scripts/kill_app' },
           { text: 'linux_limit.sh', link: '/scripts/linux_limit' },
           { text: 'get_ip.sh', link: '/scripts/get_ip' },
-          { text: 'uninstall_docker.sh', link: '/scripts/uninstall_docker' }
+          { text: 'uninstall_docker.sh', link: '/scripts/uninstall_docker' },
+          { text: 'disable_docker.sh', link: '/scripts/disable_docker' },
+          { text: 'enable_docker.sh', link: '/scripts/enable_docker' },
+          { text: 'fix_env.sh', link: '/scripts/fix_env' }
         ]
       }
     ],

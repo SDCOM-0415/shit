@@ -29,6 +29,9 @@ hero:
 - **linux_limit.sh**: 目录大小限制相关的脚本，有交互模式和非交互模式
 - **get_ip.sh**: 在termux中获取本机IP地址的脚本
 - **uninstall_docker.sh**: Docker卸载脚本
+- **disable_docker.sh**: 彻底禁用Docker并防止重新安装
+- **enable_docker.sh**: 重新启用Docker
+- **fix_env.sh**: 将环境变量永久固定到shell配置文件
 
 ## 使用方法
 

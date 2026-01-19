@@ -8,6 +8,9 @@
 - [linux_limit.sh](./linux_limit.md) - 目录大小限制相关的脚本
 - [get_ip.sh](./get_ip.md) - 在termux中获取本机IP地址的脚本
 - [uninstall_docker.sh](./uninstall_docker.md) - Docker卸载脚本
+- [disable_docker.sh](./disable_docker.md) - 彻底禁用Docker并防止重新安装
+- [enable_docker.sh](./enable_docker.md) - 重新启用Docker
+- [fix_env.sh](./fix_env.md) - 将环境变量永久固定到shell配置文件
 
 ## 如何使用这些脚本
 
