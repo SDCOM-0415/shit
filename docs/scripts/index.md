@@ -11,6 +11,7 @@
 - [disable_docker.sh](./disable_docker.md) - 彻底禁用Docker并防止重新安装
 - [enable_docker.sh](./enable_docker.md) - 重新启用Docker
 - [fix_env.sh](./fix_env.md) - 将环境变量永久固定到shell配置文件
+- [upload_to_box.sh](./upload_to_box.md) - 上传文件到文件快递柜的脚本
 
 ## 如何使用这些脚本
 

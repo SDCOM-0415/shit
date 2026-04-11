@@ -26,7 +26,8 @@ export default defineConfig({
           { text: 'uninstall_docker.sh', link: '/scripts/uninstall_docker' },
           { text: 'disable_docker.sh', link: '/scripts/disable_docker' },
           { text: 'enable_docker.sh', link: '/scripts/enable_docker' },
-          { text: 'fix_env.sh', link: '/scripts/fix_env' }
+          { text: 'fix_env.sh', link: '/scripts/fix_env' },
+          { text: 'upload_to_box.sh', link: '/scripts/upload_to_box' }
         ]
       }
     ],
@@ -55,7 +56,7 @@ export default defineConfig({
       port: 5173,
       strictPort: true,
       // 添加允许的主机
-      allowedHosts: ['164kkzowny-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app', 'shit.sdcom.top']
+      allowedHosts: ['164kkzowny-5173.cnb.run', 'mctbxvdgcs-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app', 'shit.sdcom.top', 'shit.cdn.sdcom.top']
     }
   }
 })

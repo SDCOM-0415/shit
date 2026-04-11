@@ -6,6 +6,20 @@
 
 ## 使用方法
 
+### 下载脚本
+
+CNB:
+```bash
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/fix_env.sh && sudo chmod +x ./fix_env.sh
+```
+
+Github:
+```bash
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/fix_env.sh && sudo chmod +x ./fix_env.sh
+```
+
+### 运行脚本
+
 ```bash
 # 运行脚本
 ./fix_env.sh
