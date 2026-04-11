@@ -5,7 +5,8 @@ Github: https://github.com/SDCOM-0415/shit
 
 # 访问地址
 https://shit.sdcom.asia/ </p>
-https://shit-sdcom.netlify.app/
+https://shit-sdcom.netlify.app/ </p>
+https://shit.sdcom.top/ </p>
 
  
 # 部署状态
