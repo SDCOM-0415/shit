@@ -1,5 +1,7 @@
 # disable_docker.sh
 
+这是一个用于彻底禁用 Docker 并防止重新安装的脚本，测试支持`Debian 12` `Ubuntu 22.04`，当前版本为<Badge type="tip" text="v1.0" />。
+
 ## 功能说明
 
 彻底禁用 Docker 并防止重新安装。该脚本会：

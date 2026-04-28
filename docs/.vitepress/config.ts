@@ -27,7 +27,8 @@ export default defineConfig({
           { text: 'disable_docker.sh', link: '/scripts/disable_docker' },
           { text: 'enable_docker.sh', link: '/scripts/enable_docker' },
           { text: 'fix_env.sh', link: '/scripts/fix_env' },
-          { text: 'upload_to_box.sh', link: '/scripts/upload_to_box' }
+          { text: 'upload_to_box.sh', link: '/scripts/upload_to_box' },
+          { text: 'port_forward.sh', link: '/scripts/port_forward' }
         ]
       }
     ],
