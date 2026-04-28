@@ -56,7 +56,7 @@ export default defineConfig({
       port: 5173,
       strictPort: true,
       // 添加允许的主机
-      allowedHosts: ['164kkzowny-5173.cnb.run', 'mctbxvdgcs-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app', 'shit.sdcom.top', 'shit.cdn.sdcom.top']
+      allowedHosts: ['w0ditgrw5h-5173.cnb.run', 'mctbxvdgcs-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app', 'shit.sdcom.top', 'shit.cdn.sdcom.top']
     }
   }
 })
