@@ -1,5 +1,7 @@
 # enable_docker.sh
 
+这是一个用于重新启用 Docker 的脚本，测试支持`Debian 12` `Ubuntu 22.04`，当前版本为<Badge type="tip" text="v1.0" />。
+
 ## 功能说明
 
 重新启用 Docker，解除 `disable_docker.sh` 设置所有限制并安装 Docker。

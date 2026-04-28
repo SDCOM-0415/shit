@@ -1,5 +1,7 @@
 # fix_env.sh
 
+这是一个用于将环境变量永久固定到 shell 配置文件的脚本，测试支持`Bash` `Zsh`，当前版本为<Badge type="tip" text="v1.0" />。
+
 ## 功能说明
 
 将环境变量永久固定到用户的 shell 配置文件中，防止环境变量在会话结束后丢失。支持自动检测并写入 .bashrc、.zshrc 或 .profile。
