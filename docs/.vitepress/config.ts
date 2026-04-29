@@ -4,7 +4,11 @@ export default defineConfig({
   title: "Shell脚本文档",
   description: "Shell脚本集合的详细文档",
   head: [
-    ['link', { rel: 'icon', href: '/image/favicon.ico' }]
+    ['link', { rel: 'icon', href: '/image/favicon.ico', sizes: 'any' }],
+    ['link', { rel: 'icon', href: '/image/logo.svg', type: 'image/svg+xml' }],
+    ['link', { rel: 'apple-touch-icon', href: '/image/apple-touch-icon-180x180.png' }],
+    ['link', { rel: 'manifest', href: '/manifest.webmanifest' }],
+    ['meta', { name: 'theme-color', content: '#3E4E5D' }]
   ],
   ignoreDeadLinks: true,
   
