@@ -35,6 +35,7 @@ This project is a static documentation site built with **VitePress**, designed t
 - **Code Highlighting**: Shell script syntax highlighting
 - **Language Switching**: Preserves current page position when switching languages
 - **Sitemap**: Automatically generates sitemap.xml for search engine indexing
+- **PWA Support**: Supports offline access, installable to home screen, automatic updates
 
 ### Documentation Structure
 

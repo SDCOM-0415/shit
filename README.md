@@ -28,6 +28,7 @@ https://shit-sdcom.netlify.app/
 - ✅ 代码语法高亮
 - ✅ 网站地图（sitemap.xml）
 - ✅ 自定义导航和侧边栏
+- ✅ PWA 支持（离线访问、可安装、自动更新）
 
 ## 文件结构
 
