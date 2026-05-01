@@ -1,14 +1,36 @@
 import { defineConfig } from 'vitepress'
+import { withPwa } from '@vite-pwa/vitepress'
 
-export default defineConfig({
+// 网站基础 URL - 根据需要修改
+const baseUrl = 'https://shit.sdcom.top'
+
+export default withPwa(defineConfig({
   title: "Shell脚本文档",
-  description: "Shell脚本集合的详细文档",
+  description: "Shell脚本集合的详细文档 - 提供 kill_app, linux_limit, get_ip 等常用 Shell 脚本的使用说明和示例",
   head: [
     ['link', { rel: 'icon', href: '/image/favicon.ico', sizes: 'any' }],
     ['link', { rel: 'icon', href: '/image/logo.svg', type: 'image/svg+xml' }],
     ['link', { rel: 'apple-touch-icon', href: '/image/apple-touch-icon-180x180.png' }],
     ['link', { rel: 'manifest', href: '/manifest.webmanifest' }],
-    ['meta', { name: 'theme-color', content: '#3E4E5D' }]
+    ['meta', { name: 'theme-color', content: '#3E4E5D' }],
+    // SEO 基础标签
+    ['meta', { name: 'author', content: 'SDCOM' }],
+    ['meta', { name: 'keywords', content: 'Shell脚本,Linux脚本,Shell文档,脚本教程,kill_app,linux_limit,get_ip,docker管理' }],
+    ['meta', { name: 'robots', content: 'index, follow' }],
+    ['meta', { name: 'googlebot', content: 'index, follow' }],
+    ['meta', { name: 'revisit-after', content: '7 days' }],
+    ['meta', { name: 'copyright', content: 'Copyright 2026 SDCOM' }],
+    ['meta', { name: 'language', content: 'zh-CN' }],
+    // Open Graph 基础标签
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:site_name', content: 'Shell脚本文档' }],
+    ['meta', { property: 'og:image', content: `${baseUrl}/image/logo.svg` }],
+    ['meta', { property: 'og:image:width', content: '512' }],
+    ['meta', { property: 'og:image:height', content: '512' }],
+    ['meta', { property: 'og:image:type', content: 'image/svg+xml' }],
+    // Twitter Card 基础标签
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: `${baseUrl}/image/logo.svg` }]
   ],
   ignoreDeadLinks: true,
   
@@ -143,6 +165,63 @@ export default defineConfig({
     }
   },
   
+  // 动态生成每个页面的 SEO 标签
+  transformHead: ({ pageData, title, description }) => {
+    const canonicalUrl = `${baseUrl}${pageData.relativePath.replace(/((^|\/)index)?\.md$/, '$2')}`
+    const pageTitle = title || pageData.title || "Shell脚本文档"
+    const pageDescription = description || pageData.description || "Shell脚本集合的详细文档"
+    const pageLang = pageData.lang || 'zh-CN'
+    
+    // 判断页面类型
+    const isHomePage = pageData.relativePath === 'index.md' || pageData.relativePath === ''
+    const schemaType = isHomePage ? 'WebSite' : 'TechArticle'
+    
+    // 创建 JSON-LD 结构化数据
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': schemaType,
+      name: pageTitle,
+      description: pageDescription,
+      url: canonicalUrl,
+      inLanguage: pageLang,
+      author: {
+        '@type': 'Organization',
+        name: 'SDCOM',
+        url: baseUrl
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'SDCOM',
+        logo: {
+          '@type': 'ImageObject',
+          url: `${baseUrl}/image/logo.svg`
+        }
+      }
+    }
+    
+    // 如果是文章类型，添加更多字段
+    if (!isHomePage) {
+      jsonLd.datePublished = pageData.frontmatter?.date || new Date().toISOString().split('T')[0]
+      jsonLd.dateModified = pageData.lastUpdated || new Date().toISOString().split('T')[0]
+      jsonLd.headline = pageTitle
+    }
+    
+    return [
+      // Canonical URL
+      ['link', { rel: 'canonical', href: canonicalUrl }],
+      // Open Graph 动态标签
+      ['meta', { property: 'og:title', content: pageTitle }],
+      ['meta', { property: 'og:description', content: pageDescription }],
+      ['meta', { property: 'og:url', content: canonicalUrl }],
+      ['meta', { property: 'og:locale', content: pageLang === 'zh-CN' ? 'zh_CN' : pageLang }],
+      // Twitter Card 动态标签
+      ['meta', { name: 'twitter:title', content: pageTitle }],
+      ['meta', { name: 'twitter:description', content: pageDescription }],
+      // JSON-LD 结构化数据
+      ['script', { type: 'application/ld+json' }, JSON.stringify(jsonLd, null, 2)]
+    ]
+  },
+  
   vite: {
     server: {
       host: '0.0.0.0',
@@ -151,4 +230,4 @@ export default defineConfig({
       allowedHosts: ['6xa7hc8o04-5173.cnb.run', 'mctbxvdgcs-5173.cnb.run', 'localhost', 'shit.sdcom.asia', 'shit-sdcom.netlify.app', 'shit.sdcom.top', 'shit.cdn.sdcom.top']
     }
   }
-})
+}))

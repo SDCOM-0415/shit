@@ -1,0 +1,17 @@
+# robots.txt for Shell Scripts Documentation
+# https://shit.sdcom.top
+
+User-agent: *
+Allow: /
+
+# 禁止爬取以下目录
+Disallow: /images/
+Disallow: /.vitepress/
+Disallow: /node_modules/
+Disallow: /.git/
+
+# Sitemap 位置
+Sitemap: https://shit.sdcom.top/sitemap.xml
+
+# 爬取延迟（可选，对友好爬虫建议）
+Crawl-delay: 1

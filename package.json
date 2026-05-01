@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
+    "docs:build": "vitepress build docs && node docs/.vitepress/generate-sitemap.cjs docs/.vitepress/dist",
     "docs:preview": "vitepress preview docs"
   },
   "keywords": [
@@ -18,6 +18,8 @@
   "devDependencies": {
     "@vite-pwa/assets-generator": "^1.0.2",
     "@vite-pwa/vitepress": "^1.1.0",
+    "shiki": "^4.0.2",
+    "sitemap": "^9.0.1",
     "vitepress": "^1.0.0-rc.31"
   }
 }
