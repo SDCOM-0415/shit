@@ -181,7 +181,6 @@ from curl_cffi import requests
 # 配置
 # ============================================================
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_OUTPUT_DIR = SCRIPT_DIR  # 默认CBZ文件生成在脚本所在目录
 
 API_BASE = "https://api-get-v3.mgsearcher.com/api/chapter/getinfo"
 MANGA_API = "https://api-get-v3.mgsearcher.com/api/manga/get"
@@ -403,12 +402,9 @@ def main():
     )
     parser.add_argument(
         "-o", "--output", default=None,
-        help="指定下载目录 (默认: 脚本所在目录)"
+        help="指定下载目录 (交互模式下会要求输入)"
     )
     args = parser.parse_args()
-
-    # 确定下载目录
-    output_dir = args.output or DEFAULT_OUTPUT_DIR
 
     print("=" * 56)
     print("   cloudme.one 漫画章节下载工具")
@@ -419,24 +415,30 @@ def main():
 
     # --- 第0步: 确认下载目录 ---
     print("【下载目录】")
-    print(f"  当前: {os.path.abspath(output_dir)}")
-    dir_input = input(f"  输入新路径可直接修改，回车确认: ").strip()
+    if args.output:
+        output_dir = args.output
+        print(f"  命令行指定: {os.path.abspath(output_dir)}")
+        dir_input = input(f"  输入新路径可修改，回车确认: ").strip()
+    else:
+        print("  请输入下载目录路径 (CBZ文件将保存到此目录)")
+        dir_input = input("  下载目录: ").strip()
+
     if dir_input:
-        # 去除首尾引号（用户可能从资源管理器复制路径带引号）
         dir_input = dir_input.strip('"').strip("'")
-        # 展开 ~ 为用户主目录 (macOS/Linux)
         dir_input = os.path.expanduser(dir_input)
         output_dir = dir_input
 
-    # 校验并创建目录
+    # 校验路径
+    if not output_dir:
+        print(f"  {SYM_FAIL} 未指定下载目录")
+        return
+
     try:
         output_dir = os.path.abspath(output_dir)
         os.makedirs(output_dir, exist_ok=True)
     except OSError as e:
         print(f"  {SYM_FAIL} 目录无效: {e}")
-        print(f"  将使用默认目录: {DEFAULT_OUTPUT_DIR}")
-        output_dir = DEFAULT_OUTPUT_DIR
-        os.makedirs(output_dir, exist_ok=True)
+        return
     print(f"  {SYM_OK} 下载目录: {output_dir}")
 
     # --- 第1步: 输入漫画ID ---
@@ -485,21 +487,23 @@ def main():
 
     # --- 第2.5步: 是否去掉标题前缀 ---
     strip_prefix = False
-    # 检测章节标题中是否含有 _ 分隔符
     sample_titles = [chapter_map[o]['title'] for o in sorted_orders[:5]]
-    has_underscore = any('_' in t for t in sample_titles)
-    if has_underscore:
-        print(f"\n【前缀处理】")
-        print("  检测到章节标题含有 '_' 分隔符，示例:")
-        for t in sample_titles:
+    print(f"\n【前缀处理】")
+    print("  章节标题示例:")
+    for t in sample_titles:
+        if '_' in t:
             prefix, _, suffix = t.partition('_')
-            print(f"    原始: {t}  →  去前缀后: {suffix}")
-        prefix_choice = input("  是否去掉 '_' 前的前缀? (y/N): ").strip().lower()
-        if prefix_choice == 'y':
-            strip_prefix = True
-            print(f"  {SYM_OK} 将去掉前缀 (保留 '_' 后的部分)")
+            print(f"    {t}  (前缀: {prefix})")
         else:
-            print(f"  {SYM_SKIP} 保留完整标题")
+            print(f"    {t}")
+    print("  前缀格式: '_' 前的名称，去掉后保留 '_' 后的部分")
+    print("  示例: '某漫画_第101话' → '第101话'")
+    prefix_choice = input("  是否去掉标题中 '_' 前的前缀? (y/N): ").strip().lower()
+    if prefix_choice == 'y':
+        strip_prefix = True
+        print(f"  {SYM_OK} 将去掉前缀 (保留 '_' 后的部分)")
+    else:
+        print(f"  {SYM_SKIP} 保留完整标题")
 
     # --- 第3步: 配置Cloudflare Cookie ---
     print(f"\n【第3步】Cloudflare Cookie (可选)")
