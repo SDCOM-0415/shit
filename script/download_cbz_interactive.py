@@ -2,21 +2,34 @@
 cloudme.one 漫画章节下载工具
 
 用法:
-  python download_cbz_interactive.py                    # 交互模式
-  python download_cbz_interactive.py -o D:\\Comics       # 指定下载目录 (Windows)
-  python download_cbz_interactive.py -o ~/Comics        # 指定下载目录 (macOS/Linux)
-  python download_cbz_interactive.py --output ./comics  # 同上
+  # 交互模式
+  python download_cbz_interactive.py
+
+  # 非交互模式 (提供所有必要参数后直接开始下载)
+  python download_cbz_interactive.py -o D:\\Comics -m 10 -c 101-120 --cf xxx
+  python download_cbz_interactive.py -o ~/Comics -m 10 -c all -p http://127.0.0.1:7890 -t 16 -j 3 --strip-prefix
 
 支持系统: Windows / macOS / Linux
 
 功能:
-  - 交互式选择要下载的章节范围
+  - 交互式或命令行模式选择要下载的章节范围
   - 自动通过API获取章节信息
   - 通过img.cloudme.one代理下载高质量图片
+  - 多线程下载图片，多任务并行下载章节
   - 打包为CBZ文件
-  - 支持命令行指定下载目录
   - 自动检测并安装缺失依赖
   - 跨平台兼容 (Windows/macOS/Linux)
+
+命令行参数:
+  -o, --output DIR         下载目录
+  -m, --mid ID             漫画ID
+  -c, --chapters RANGE     章节范围 (如 101-120 或 all)
+  --cf TOKEN               cf_clearance cookie
+  -p, --proxy URL          HTTP代理 (如 http://127.0.0.1:7890)
+  -t, --threads N          图片下载线程数 (1-32, 默认8)
+  -j, --jobs N             并行下载章节数 (1-5, 默认5)
+  --strip-prefix           去掉标题中 '_' 前的前缀
+  -y, --yes                跳过确认直接开始
 
 依赖:
   pip install curl_cffi
@@ -31,6 +44,8 @@ import json
 import subprocess
 import argparse
 import platform
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 # ============================================================
@@ -330,7 +345,7 @@ def strip_title_prefix(title):
     return suffix if suffix else title
 
 
-def create_cbz(title, images, session, output_dir, strip_prefix=False):
+def create_cbz(title, images, session, output_dir, strip_prefix=False, max_workers=8):
     """下载图片并创建CBZ文件，返回(True, 文件路径) 或 (False, 错误信息)"""
     display_title = strip_title_prefix(title) if strip_prefix else title
     safe_title = safe_filename(display_title)
@@ -341,39 +356,48 @@ def create_cbz(title, images, session, output_dir, strip_prefix=False):
         print(f"  {SYM_SKIP} 已存在，跳过: {cbz_filename}")
         return True, cbz_path
 
-    print(f"  {SYM_DOWN} 下载中: {cbz_filename} ({len(images)} 张图片)")
+    total = len(images)
+    print(f"  {SYM_DOWN} 下载中: {cbz_filename} ({total} 张图片, {max_workers} 线程)")
 
-    downloaded = []
+    # 多线程下载
+    downloaded = {}
     failed = 0
-    for i, img in enumerate(images):
-        data = download_image(img["url"], session)
-        if data:
-            downloaded.append((i, data))
-        else:
-            failed += 1
+    completed = 0
+    lock = threading.Lock()
 
-        # 进度显示
-        progress = i + 1
-        if progress % 10 == 0 or progress == len(images):
+    def _download_one(idx, img_url):
+        nonlocal failed, completed
+        data = download_image(img_url, session)
+        with lock:
+            if data:
+                downloaded[idx] = data
+            else:
+                failed += 1
+            completed += 1
+            # 进度显示
             bar_len = 30
-            filled = int(bar_len * progress / len(images))
+            filled = int(bar_len * completed / total)
             bar = BAR_FILL * filled + BAR_EMPTY * (bar_len - filled)
-            pct = progress * 100 / len(images)
-            sys.stdout.write(f"\r  [{bar}] {pct:.0f}% ({progress}/{len(images)})")
+            pct = completed * 100 / total
+            sys.stdout.write(f"\r  [{bar}] {pct:.0f}% ({completed}/{total})")
             sys.stdout.flush()
 
-        # 每10张图暂停一下，避免过快请求
-        if progress % 10 == 0 and progress < len(images):
-            time.sleep(0.3)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = []
+        for i, img in enumerate(images):
+            futures.append(executor.submit(_download_one, i, img["url"]))
+        for f in as_completed(futures):
+            pass  # 结果已在 _download_one 中处理
 
     print()  # 换行
 
     if not downloaded:
         return False, "未能下载任何图片"
 
-    # 创建CBZ
+    # 按序号排序后创建CBZ
+    sorted_items = sorted(downloaded.items(), key=lambda x: x[0])
     with zipfile.ZipFile(cbz_path, 'w', zipfile.ZIP_STORED) as zf:
-        for idx, data in downloaded:
+        for idx, data in sorted_items:
             ext = ".webp"
             if data[:4] == b'\x89PNG':
                 ext = ".png"
@@ -385,10 +409,25 @@ def create_cbz(title, images, session, output_dir, strip_prefix=False):
 
     file_size = os.path.getsize(cbz_path)
     size_str = f"{file_size / 1024:.0f} KB" if file_size < 1024 * 1024 else f"{file_size / 1024 / 1024:.1f} MB"
-    print(f"  {SYM_OK} 完成: {cbz_filename} ({size_str}, {len(downloaded)}/{len(images)} 张)")
+    print(f"  {SYM_OK} 完成: {cbz_filename} ({size_str}, {len(downloaded)}/{total} 张)")
     if failed:
         print(f"  {SYM_WARN} {failed} 张图片下载失败")
     return True, cbz_path
+
+
+def _process_chapter(order, ch, mid, session, output_dir, strip_prefix, max_workers):
+    """处理单个章节：获取信息 + 下载图片 + 打包CBZ"""
+    chapter_info = get_chapter_images(ch["id"], mid, session)
+    if not chapter_info:
+        return order, False, "获取章节信息失败"
+
+    title = chapter_info["title"] or ch["title"]
+    ok, result = create_cbz(title, chapter_info["images"], session, output_dir, strip_prefix, max_workers)
+    if ok:
+        if "已存在" in str(result):
+            return order, True, "skipped"
+        return order, True, result
+    return order, False, result
 
 
 # ============================================================
@@ -400,11 +439,23 @@ def main():
         description="cloudme.one 漫画章节下载工具",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
-        "-o", "--output", default=None,
-        help="指定下载目录 (交互模式下会要求输入)"
-    )
+    parser.add_argument("-o", "--output", default=None, help="下载目录")
+    parser.add_argument("-m", "--mid", default=None, help="漫画ID (如 cloudme.one/refs/10 中的 10)")
+    parser.add_argument("-c", "--chapters", default=None, help="章节范围 (如 101-120, 101,103,105, all)")
+    parser.add_argument("--cf", default=None, help="cf_clearance cookie (用于高质量图片)")
+    parser.add_argument("-p", "--proxy", default=None, help="HTTP代理 (如 http://127.0.0.1:7890)")
+    parser.add_argument("-t", "--threads", type=int, default=None, help="图片下载线程数 (1-32, 默认8)")
+    parser.add_argument("-j", "--jobs", type=int, default=None, help="并行下载章节数 (1-5, 默认5)")
+    parser.add_argument("--strip-prefix", action="store_true", default=False, help="去掉标题中 '_' 前的前缀")
+    parser.add_argument("-y", "--yes", action="store_true", default=False, help="跳过确认直接开始下载")
     args = parser.parse_args()
+
+    # 判断是否为非交互模式 (所有必要参数都已通过命令行提供)
+    non_interactive = all([
+        args.output,
+        args.mid,
+        args.chapters is not None,
+    ])
 
     print("=" * 56)
     print("   cloudme.one 漫画章节下载工具")
@@ -413,22 +464,27 @@ def main():
 
     session = requests.Session()
 
-    # --- 第0步: 确认下载目录 ---
-    print("【下载目录】")
+    # ==================== 下载目录 ====================
     if args.output:
         output_dir = args.output
-        print(f"  命令行指定: {os.path.abspath(output_dir)}")
-        dir_input = input(f"  输入新路径可修改，回车确认: ").strip()
+        if non_interactive:
+            print(f"  {SYM_OK} 下载目录: {os.path.abspath(output_dir)}")
+        else:
+            print(f"  命令行指定: {os.path.abspath(output_dir)}")
+            dir_input = input("  输入新路径可修改，回车确认: ").strip()
+            if dir_input:
+                dir_input = dir_input.strip('"').strip("'")
+                dir_input = os.path.expanduser(dir_input)
+                output_dir = dir_input
     else:
+        print("【下载目录】")
         print("  请输入下载目录路径 (CBZ文件将保存到此目录)")
         dir_input = input("  下载目录: ").strip()
-
-    if dir_input:
-        dir_input = dir_input.strip('"').strip("'")
-        dir_input = os.path.expanduser(dir_input)
+        if dir_input:
+            dir_input = dir_input.strip('"').strip("'")
+            dir_input = os.path.expanduser(dir_input)
         output_dir = dir_input
 
-    # 校验路径
     if not output_dir:
         print(f"  {SYM_FAIL} 未指定下载目录")
         return
@@ -439,17 +495,104 @@ def main():
     except OSError as e:
         print(f"  {SYM_FAIL} 目录无效: {e}")
         return
-    print(f"  {SYM_OK} 下载目录: {output_dir}")
+    if not args.output or not non_interactive:
+        print(f"  {SYM_OK} 下载目录: {output_dir}")
 
-    # --- 第1步: 输入漫画ID ---
-    print("【第1步】输入漫画ID")
-    print("  提示: 漫画ID是网站URL中的数字，例如 cloudme.one/refs/10 中的 10")
-    mid = input("  漫画ID (默认 10): ").strip()
-    if not mid:
-        mid = "10"
+    # ==================== 代理设置 ====================
+    if args.proxy:
+        proxy_url = args.proxy
+        if non_interactive:
+            print(f"  {SYM_OK} 代理: {proxy_url}")
+        else:
+            print(f"\n【代理设置】命令行指定: {proxy_url}")
+            proxy_input = input("  输入新代理可修改，直接回车确认: ").strip()
+            if proxy_input:
+                proxy_url = proxy_input
+    else:
+        if non_interactive:
+            proxy_url = None
+        else:
+            print(f"\n【代理设置】(可选)")
+            print("  格式: http://host:port 或 socks5://host:port")
+            proxy_input = input("  代理地址 (直接回车跳过): ").strip()
+            proxy_url = proxy_input or None
 
-    # --- 第2步: 获取漫画信息 ---
-    print(f"\n【第2步】获取漫画信息 (ID: {mid}) ...")
+    if proxy_url:
+        session.proxies = {"http": proxy_url, "https": proxy_url}
+        if not args.proxy or not non_interactive:
+            print(f"  {SYM_OK} 已设置代理: {proxy_url}")
+    else:
+        if not non_interactive:
+            print(f"  {SYM_SKIP} 不使用代理")
+
+    # ==================== 线程设置 ====================
+    max_workers = 8
+    if args.threads is not None:
+        if 1 <= args.threads <= 32:
+            max_workers = args.threads
+        else:
+            print(f"  {SYM_WARN} 线程数需在 1-32 之间，使用默认 8")
+    elif not non_interactive:
+        print(f"\n【下载线程】")
+        print(f"  当前: {max_workers} 线程")
+        thread_input = input("  是否设置更多线程? (1-32, 回车保持默认): ").strip()
+        if thread_input:
+            try:
+                t = int(thread_input)
+                if 1 <= t <= 32:
+                    max_workers = t
+                    print(f"  {SYM_OK} 设置为 {max_workers} 线程")
+                else:
+                    print(f"  {SYM_WARN} 线程数需在 1-32 之间，使用默认 {max_workers} 线程")
+            except ValueError:
+                print(f"  {SYM_WARN} 无效输入，使用默认 {max_workers} 线程")
+    if non_interactive:
+        print(f"  {SYM_OK} 下载线程: {max_workers}")
+
+    # ==================== 并行任务数 ====================
+    max_jobs = 5
+    if args.jobs is not None:
+        if 1 <= args.jobs <= 5:
+            max_jobs = args.jobs
+        else:
+            print(f"  {SYM_WARN} 并行任务数需在 1-5 之间，使用默认 5")
+    elif not non_interactive:
+        print(f"\n【并行任务】")
+        print(f"  当前: {max_jobs} 个章节同时下载")
+        jobs_input = input("  设置并行任务数 (1-5, 回车保持默认): ").strip()
+        if jobs_input:
+            try:
+                j = int(jobs_input)
+                if 1 <= j <= 5:
+                    max_jobs = j
+                    print(f"  {SYM_OK} 设置为 {max_jobs} 个并行任务")
+                else:
+                    print(f"  {SYM_WARN} 并行任务数需在 1-5 之间，使用默认 {max_jobs}")
+            except ValueError:
+                print(f"  {SYM_WARN} 无效输入，使用默认 {max_jobs}")
+    if non_interactive:
+        print(f"  {SYM_OK} 并行任务: {max_jobs}")
+
+    # ==================== 漫画ID ====================
+    if args.mid:
+        mid = args.mid
+        if non_interactive:
+            print(f"  {SYM_OK} 漫画ID: {mid}")
+        else:
+            print(f"\n【漫画ID】命令行指定: {mid}")
+            mid_input = input("  输入新ID可修改，回车确认: ").strip()
+            if mid_input:
+                mid = mid_input
+    else:
+        print("\n【漫画ID】")
+        print("  提示: 漫画ID是网站URL中的数字，例如 cloudme.one/refs/10 中的 10")
+        mid = input("  漫画ID: ").strip()
+        if not mid:
+            print(f"  {SYM_FAIL} 未输入漫画ID")
+            return
+
+    # ==================== 获取漫画信息 ====================
+    print(f"\n  获取漫画信息 (ID: {mid}) ...")
     manga = get_manga_info(mid, session)
     if not manga:
         print(f"  {SYM_FAIL} 无法获取漫画信息，请检查ID是否正确")
@@ -483,55 +626,91 @@ def main():
 
     sorted_orders = sorted(chapter_map.keys())
     print(f"  共 {len(chapter_map)} 章，范围: {sorted_orders[0]} - {sorted_orders[-1]}")
-    print(f"  最新: {chapter_map[sorted_orders[-1]]['title']}")
 
-    # --- 第2.5步: 是否去掉标题前缀 ---
-    strip_prefix = False
-    sample_titles = [chapter_map[o]['title'] for o in sorted_orders[:5]]
-    print(f"\n【前缀处理】")
-    print("  章节标题示例:")
-    for t in sample_titles:
-        if '_' in t:
-            prefix, _, suffix = t.partition('_')
-            print(f"    {t}  (前缀: {prefix})")
+    # ==================== 前缀处理 ====================
+    strip_prefix = args.strip_prefix
+    if not non_interactive:
+        sample_titles = [chapter_map[o]['title'] for o in sorted_orders[:5]]
+        print(f"\n【前缀处理】")
+        print("  章节标题示例:")
+        for t in sample_titles:
+            if '_' in t:
+                prefix, _, suffix = t.partition('_')
+                print(f"    {t}  (前缀: {prefix})")
+            else:
+                print(f"    {t}")
+        print("  前缀格式: '_' 前的名称，去掉后保留 '_' 后的部分")
+        print("  示例: '某漫画_第101话' → '第101话'")
+        if strip_prefix:
+            print(f"  命令行指定: 去掉前缀")
+            prefix_input = input("  是否修改? (输入 n 保留完整标题，回车确认): ").strip().lower()
+            if prefix_input == 'n':
+                strip_prefix = False
+                print(f"  {SYM_SKIP} 保留完整标题")
+            else:
+                print(f"  {SYM_OK} 将去掉前缀 (保留 '_' 后的部分)")
         else:
-            print(f"    {t}")
-    print("  前缀格式: '_' 前的名称，去掉后保留 '_' 后的部分")
-    print("  示例: '某漫画_第101话' → '第101话'")
-    prefix_choice = input("  是否去掉标题中 '_' 前的前缀? (y/N): ").strip().lower()
-    if prefix_choice == 'y':
-        strip_prefix = True
-        print(f"  {SYM_OK} 将去掉前缀 (保留 '_' 后的部分)")
-    else:
-        print(f"  {SYM_SKIP} 保留完整标题")
+            prefix_choice = input("  是否去掉标题中 '_' 前的前缀? (y/N): ").strip().lower()
+            if prefix_choice == 'y':
+                strip_prefix = True
+                print(f"  {SYM_OK} 将去掉前缀 (保留 '_' 后的部分)")
+            else:
+                print(f"  {SYM_SKIP} 保留完整标题")
+    elif strip_prefix:
+        print(f"  {SYM_OK} 去掉标题前缀")
 
-    # --- 第3步: 配置Cloudflare Cookie ---
-    print(f"\n【第3步】Cloudflare Cookie (可选)")
-    print("  说明: 提供 cf_clearance cookie 可下载高质量图片，否则只能下载低质量版本")
-    print("  获取方法: 在浏览器中打开 cloudme.one -> F12 -> Application -> Cookies -> cf_clearance")
-    cf_input = input("  cf_clearance (直接回车跳过): ").strip()
-    if cf_input:
-        COOKIES["cf_clearance"] = cf_input
-        print(f"  {SYM_OK} 已设置 cf_clearance")
-    elif COOKIES.get("cf_clearance"):
-        print(f"  {SYM_OK} 使用脚本内置的 cf_clearance")
+    # ==================== Cloudflare Cookie ====================
+    if args.cf:
+        COOKIES["cf_clearance"] = args.cf
+        if non_interactive:
+            print(f"  {SYM_OK} cf_clearance: 已设置")
+        else:
+            print(f"\n【Cloudflare Cookie】命令行已指定")
+            cf_input = input("  输入新cookie可修改，直接回车确认: ").strip()
+            if cf_input:
+                COOKIES["cf_clearance"] = cf_input
+                print(f"  {SYM_OK} 已更新 cf_clearance")
     else:
-        print(f"  {SYM_SKIP} 未设置 cf_clearance，将使用CDN直连（低质量）")
+        if non_interactive:
+            pass  # 非交互模式未提供则静默跳过
+        else:
+            print(f"\n【Cloudflare Cookie】(可选)")
+            print("  说明: 提供 cf_clearance cookie 可下载高质量图片，否则只能下载低质量版本")
+            print("  获取方法: 浏览器打开 cloudme.one -> F12 -> Application -> Cookies -> cf_clearance")
+            cf_input = input("  cf_clearance (直接回车跳过): ").strip()
+            if cf_input:
+                COOKIES["cf_clearance"] = cf_input
+                print(f"  {SYM_OK} 已设置 cf_clearance")
+            elif COOKIES.get("cf_clearance"):
+                print(f"  {SYM_OK} 使用脚本内置的 cf_clearance")
+            else:
+                print(f"  {SYM_SKIP} 未设置 cf_clearance，将使用CDN直连（低质量）")
 
-    # --- 第4步: 选择章节 ---
-    print(f"\n【第4步】选择要下载的章节")
-    print(f"  可用范围: {sorted_orders[0]} - {sorted_orders[-1]}")
-    print("  输入格式示例:")
-    print("    单章: 101")
-    print("    范围: 101-120")
-    print("    多个: 101,103,105")
-    print("    混合: 101-105,108,110-112")
-    print("    全部: all")
-    range_input = input(f"  要下载的章节 (默认 all): ").strip()
-    if not range_input or range_input.lower() == 'all':
-        selected_orders = sorted_orders
+    # ==================== 选择章节 ====================
+    if args.chapters is not None:
+        if args.chapters.lower() == 'all':
+            selected_orders = sorted_orders
+        else:
+            selected_orders = parse_chapter_range(args.chapters)
+        if non_interactive:
+            pass  # 静默
+        else:
+            print(f"\n【章节范围】命令行指定: {args.chapters}")
+            range_input = input("  输入新范围可修改，回车确认: ").strip()
+            if range_input:
+                if range_input.lower() == 'all':
+                    selected_orders = sorted_orders
+                else:
+                    selected_orders = parse_chapter_range(range_input)
     else:
-        selected_orders = parse_chapter_range(range_input)
+        print(f"\n【选择章节】")
+        print(f"  可用范围: {sorted_orders[0]} - {sorted_orders[-1]}")
+        print("  输入格式: 101 | 101-120 | 101,103,105 | all")
+        range_input = input(f"  要下载的章节 (默认 all): ").strip()
+        if not range_input or range_input.lower() == 'all':
+            selected_orders = sorted_orders
+        else:
+            selected_orders = parse_chapter_range(range_input)
 
     # 过滤掉不存在的章节
     valid_orders = [o for o in selected_orders if o in chapter_map]
@@ -542,56 +721,66 @@ def main():
         print(f"  {SYM_FAIL} 没有有效的章节可下载")
         return
 
-    print(f"  将下载 {len(valid_orders)} 个章节")
-
-    # --- 第5步: 确认 ---
-    print(f"\n【确认】")
+    # ==================== 确认 ====================
+    print(f"\n{'=' * 56}")
     print(f"  漫画: {manga_title} (ID: {mid})")
     print(f"  章节: {valid_orders[0]}-{valid_orders[-1]}" if len(valid_orders) > 1 else f"  章节: {valid_orders[0]}")
     print(f"  数量: {len(valid_orders)} 章")
     print(f"  保存到: {os.path.abspath(output_dir)}")
     print(f"  图片质量: {'高质量 (代理)' if COOKIES.get('cf_clearance') else '低质量 (CDN直连)'}")
+    print(f"  网络代理: {proxy_url or '无'}")
+    print(f"  下载线程: {max_workers}")
+    print(f"  并行任务: {max_jobs}")
     print(f"  标题前缀: {'去掉' if strip_prefix else '保留完整标题'}")
-    confirm = input("\n  开始下载? (Y/n): ").strip().lower()
-    if confirm == 'n':
-        print("  已取消")
-        return
 
-    # --- 第6步: 下载 ---
+    if not args.yes or not non_interactive:
+        confirm = input("\n  开始下载? (Y/n): ").strip().lower()
+        if confirm == 'n':
+            print("  已取消")
+            return
+
+    # ==================== 下载 ====================
     print(f"\n{'=' * 56}")
-    print("  开始下载...")
+    print(f"  开始下载... (并行任务: {max_jobs})")
     print(f"{'=' * 56}")
 
     success = 0
     fail = 0
     skipped = 0
+    result_lock = threading.Lock()
 
-    for i, order in enumerate(valid_orders):
-        ch = chapter_map[order]
-        print(f"\n[{i+1}/{len(valid_orders)}] 第{order}话: {ch['title']} (ID: {ch['id']})")
-
-        chapter_info = get_chapter_images(ch["id"], mid, session)
-        if not chapter_info:
-            print(f"  {SYM_FAIL} 获取章节信息失败")
-            fail += 1
-            continue
-
-        # 用API返回的标题（更准确）
-        title = chapter_info["title"] or ch["title"]
-        ok, result = create_cbz(title, chapter_info["images"], session, output_dir, strip_prefix)
-        if ok:
-            if "已存在" in str(result):
-                skipped += 1
+    def _on_chapter_done(future):
+        nonlocal success, fail, skipped
+        order, ok, result = future.result()
+        with result_lock:
+            if ok:
+                if result == "skipped":
+                    skipped += 1
+                else:
+                    success += 1
             else:
-                success += 1
-        else:
-            fail += 1
+                fail += 1
 
-        # 章节间暂停
-        if i < len(valid_orders) - 1:
-            time.sleep(1)
+    with ThreadPoolExecutor(max_workers=max_jobs) as job_executor:
+        futures = []
+        for i, order in enumerate(valid_orders):
+            ch = chapter_map[order]
+            print(f"\n[排队] 第{order}话: {ch['title']} (ID: {ch['id']})")
+            f = job_executor.submit(
+                _process_chapter, order, ch, mid, session, output_dir,
+                strip_prefix, max_workers
+            )
+            f.add_done_callback(_on_chapter_done)
+            futures.append(f)
 
-    # --- 结果 ---
+        # 等待所有任务完成
+        for f in as_completed(futures):
+            try:
+                f.result()  # 触发异常（如果有）
+            except Exception as e:
+                print(f"  {SYM_FAIL} 任务异常: {e}")
+
+    # ==================== 结果 ====================
     print(f"\n{'=' * 56}")
     print(f"  下载完成!")
     print(f"  成功: {success}  跳过: {skipped}  失败: {fail}")
