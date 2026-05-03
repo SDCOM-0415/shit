@@ -9,6 +9,7 @@ https://shit.sdcom.top/scripts/enable_docker.html
 https://shit.sdcom.top/scripts/fix_env.html
 https://shit.sdcom.top/scripts/upload_to_box.html
 https://shit.sdcom.top/scripts/port_forward.html
+https://shit.sdcom.top/scripts/download_cbz_interactive.html
 
 https://shit.sdcom.top/en/
 https://shit.sdcom.top/en/scripts/
@@ -21,6 +22,7 @@ https://shit.sdcom.top/en/scripts/enable_docker.html
 https://shit.sdcom.top/en/scripts/fix_env.html
 https://shit.sdcom.top/en/scripts/upload_to_box.html
 https://shit.sdcom.top/en/scripts/port_forward.html
+https://shit.sdcom.top/en/scripts/download_cbz_interactive.html
 
 https://shit.sdcom.top/ja/
 https://shit.sdcom.top/ja/scripts/
@@ -33,3 +35,4 @@ https://shit.sdcom.top/ja/scripts/enable_docker.html
 https://shit.sdcom.top/ja/scripts/fix_env.html
 https://shit.sdcom.top/ja/scripts/upload_to_box.html
 https://shit.sdcom.top/ja/scripts/port_forward.html
+https://shit.sdcom.top/ja/scripts/download_cbz_interactive.html

@@ -2,8 +2,8 @@
 layout: home
 
 hero:
-  name: Shell Scripts Collection
-  text: Useful Shell Scripts Collection
+  name: Scripts Collection
+  text: Useful Scripts Collection
   tagline: Actually it's just some 💩 I wrote
   actions:
     - theme: brand
@@ -26,13 +26,13 @@ This is a collection of 💩 I wrote, but with a little practicality.
 
 ## About This Project
 
-This project is a static documentation site built with **VitePress**, designed to showcase and manage various useful Shell scripts. The site supports multilingual switching (Chinese, English, Japanese) and provides a clear document structure with a user-friendly interface.
+This project is a static documentation site built with **VitePress**, designed to showcase and manage various useful scripts (Shell / Python, etc.). The site supports multilingual switching (Chinese, English, Japanese) and provides a clear document structure with a user-friendly interface.
 
 ### Technical Features
 
 - **Responsive Design**: Perfectly adapts to desktop and mobile devices
 - **Multilingual Support**: Supports Chinese, English, and Japanese languages
-- **Code Highlighting**: Shell script syntax highlighting
+- **Code Highlighting**: Script syntax highlighting
 - **Language Switching**: Preserves current page position when switching languages
 - **Sitemap**: Automatically generates sitemap.xml for search engine indexing
 - **PWA Support**: Supports offline access, installable to home screen, automatic updates
@@ -74,14 +74,18 @@ This site is available at multiple addresses:
 
 ### Getting Scripts
 
-Each script documentation page provides methods to obtain scripts from CNB and GitHub:
+Each script documentation page provides methods to obtain scripts from CNB and GitHub (supports Shell / Python, etc.):
 
 ```bash
-# Get from CNB
-wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/script_name.sh
+# Get from CNB (Shell script example)
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/kill_app.sh
+# Get from CNB (Python script example)
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/download_cbz_interactive.py
 
-# Get from GitHub
-wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.sh
+# Get from GitHub (Shell script example)
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/kill_app.sh
+# Get from GitHub (Python script example)
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/download_cbz_interactive.py
 ```
 
 ## Main Scripts
@@ -95,6 +99,7 @@ wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.s
 - **fix_env.sh**: Permanently fix environment variables to shell configuration files
 - **upload_to_box.sh**: Script to upload files to file courier
 - **port_forward.sh**: IPsec VPN port forwarding management tool
+- **download_cbz_interactive.py**: cloudme.one manga chapter download tool
 
 ## Project Repository
 

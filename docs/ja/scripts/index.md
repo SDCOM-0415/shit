@@ -13,10 +13,13 @@
 - [fix_env.sh](./fix_env.md) - 環境変数をシェル設定ファイルに永続的に固定
 - [upload_to_box.sh](./upload_to_box.sh) - ファイルをファイルクーリアにアップロードするスクリプト
 - [port_forward.sh](./port_forward.md) - IPsec VPNポート転送管理ツール
+- [download_cbz_interactive.py](./download_cbz_interactive.md) - cloudme.one漫画チャプターダウンロードツール
 
 ## これらのスクリプトの使い方
 
-ほとんどのスクリプトは次の方法で実行できます：
+スクリプトの種類によって、実行方法が異なります：
+
+### Shell スクリプト（.sh）
 
 ```bash
 # CNB
@@ -24,6 +27,16 @@ wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/script_name.sh && sudo ch
 
 # Github
 wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.sh && sudo chmod +x ./script_name.sh && sudo ./script_name.sh
+```
+
+### Python スクリプト（.py）
+
+```bash
+# CNB
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/script_name.py && python script_name.py
+
+# Github
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.py && python script_name.py
 ```
 
 特定の使用方法とパラメータについては、各スクリプトの詳細なドキュメントを参照してください。

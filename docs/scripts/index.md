@@ -13,10 +13,13 @@
 - [fix_env.sh](./fix_env.md) - 将环境变量永久固定到shell配置文件
 - [upload_to_box.sh](./upload_to_box.md) - 上传文件到文件快递柜的脚本
 - [port_forward.sh](./port_forward.md) - IPsec VPN端口转发管理工具
+- [download_cbz_interactive.py](./download_cbz_interactive.md) - cloudme.one漫画章节下载工具
 
 ## 如何使用这些脚本
 
-大多数脚本可以通过以下方式运行：
+脚本类型不同，运行方式也不同：
+
+### Shell 脚本（.sh）
 
 ```bash
 # CNB
@@ -24,6 +27,16 @@ wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/script_name.sh && sudo ch
 
 # Github
 wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.sh && sudo chmod +x ./script_name.sh && sudo ./script_name.sh
+```
+
+### Python 脚本（.py）
+
+```bash
+# CNB
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/script_name.py && python script_name.py
+
+# Github
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.py && python script_name.py
 ```
 
 具体的使用方法和参数请参考各个脚本的详细文档。

@@ -2,8 +2,8 @@
 layout: home
 
 hero:
-  name: Shell Scripts Collection
-  text: 便利なShellスクリプトコレクション
+  name: Scripts Collection
+  text: 便利なスクリプトコレクション
   tagline: 実際には私が書いた💩のコレクションですが、少しは実用的です
   actions:
     - theme: brand
@@ -26,13 +26,13 @@ hero:
 
 ## プロジェクト紹介
 
-このプロジェクトは **VitePress** で構築された静的ドキュメントサイトです。さまざまな便利なShellスクリプトを展示および管理するために設計されています。サイトは多言語切り替え（中国語、英語、日本語）をサポートし、明確なドキュメント構造と使いやすいユーザーインターフェースを提供します。
+このプロジェクトは **VitePress** で構築された静的ドキュメントサイトです。さまざまな便利なスクリプト（Shell / Python など）を展示および管理するために設計されています。サイトは多言語切り替え（中国語、英語、日本語）をサポートし、明確なドキュメント構造と使いやすいユーザーインターフェースを提供します。
 
 ### 技術的特徴
 
 - **レスポンシブデザイン**: デスクトップおよびモバイルデバイスに完全に適応
 - **多言語サポート**: 中国語、英語、日本語に対応
-- **コードハイライト**: Shellスクリプトの構文ハイライト表示
+- **コードハイライト**: スクリプト構文のハイライト表示
 - **言語切り替え**: 言語を切り替えるときに現在のページ位置を保持
 - **サイトマップ**: searchエンジンインデックス作成のためにsitemap.xmlを自動生成
 - **PWAサポート**: オフラインアクセス、ホーム画面へのインストール、自動更新に対応
@@ -74,14 +74,18 @@ docs/
 
 ### スクリプトの取得
 
-各スクリプトドキュメントページには、CNBおよびGitHubからスクリプトを取得する方法が記載されています：
+各スクリプトドキュメントページには、CNBおよびGitHubからスクリプトを取得する方法が記載されています（Shell / Python などに対応）：
 
 ```bash
-# CNBから取得
-wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/script_name.sh
+# CNBから取得（Shellスクリプト例）
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/kill_app.sh
+# CNBから取得（Pythonスクリプト例）
+wget https://cnb.cool/SDCOM/shit/-/git/raw/main/script/download_cbz_interactive.py
 
-# GitHubから取得
-wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.sh
+# GitHubから取得（Shellスクリプト例）
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/kill_app.sh
+# GitHubから取得（Pythonスクリプト例）
+wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/download_cbz_interactive.py
 ```
 
 ## 主なスクリプト
@@ -95,6 +99,7 @@ wget https://github.com/SDCOM-0415/shit/raw/refs/heads/main/script/script_name.s
 - **fix_env.sh**: 環境変数をシェル設定ファイルに永続的に固定
 - **upload_to_box.sh**: ファイルをファイルクーリアにアップロードするスクリプト
 - **port_forward.sh**: IPsec VPNポート転送管理ツール
+- **download_cbz_interactive.py**: cloudme.one漫画チャプターダウンロードツール
 
 ## プロジェクトリポジトリ
 

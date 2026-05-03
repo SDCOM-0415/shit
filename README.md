@@ -1,8 +1,8 @@
 # Shit
-Shell 脚本集合文档站点
+脚本集合文档站点
 
 ## 项目简介
-本项目是一个基于 VitePress 构建的 Shell 脚本文档站点，提供多语言支持（中文、英文、日语），用于展示和管理各种实用的 Shell 脚本。
+本项目是一个基于 VitePress 构建的脚本文档站点，提供多语言支持（中文、英文、日语），用于展示和管理各种实用的脚本（Shell / Python 等）。
 
 ## 访问地址
 https://shit.sdcom.top/
@@ -52,7 +52,7 @@ https://shit-sdcom.netlify.app/
 │   │   │   ├── github-favicon.png
 │   │   │   └── logo.svg
 │   │   └── sitemap.xml         # 网站地图
-│   ├── scripts/                # 中文脚本文档目录
+│   ├── scripts/                # 脚本文档目录
 │   │   ├── index.md            # 脚本概览页面
 │   │   ├── kill_app.md
 │   │   ├── linux_limit.md
@@ -74,11 +74,12 @@ https://shit-sdcom.netlify.app/
 │   │       ├── index.md
 │   │       └── ... (各脚本日语文档)
 │   └── index.md                # 中文首页
-└── script/                     # Shell 脚本源码目录
+└── script/                     # 脚本源码目录
     ├── none/                   # 额外资源文件
     │   ├── pan_newuser.html
     │   └── pan_restart_password.html
     ├── disable_docker.sh
+    ├── download_cbz_interactive.py
     ├── enable_docker.sh
     ├── fix_env.sh
     ├── get_ip.sh
@@ -101,7 +102,7 @@ VitePress 的配置目录，包含站点配置文件。
 静态资源目录，存放图片、favicon 和网站地图等资源。
 
 ### docs/scripts/
-中文脚本文档目录，包含各脚本的详细说明文档。
+脚本文档目录，包含各脚本的详细说明文档。
 
 ### docs/en/
 英文文档目录，包含所有中文页面的英文翻译版本。
@@ -110,7 +111,7 @@ VitePress 的配置目录，包含站点配置文件。
 日语文档目录，包含所有中文页面的日语翻译版本。
 
 ### script/
-Shell 脚本源码目录，存放所有脚本的原始代码文件。
+脚本源码目录，存放所有脚本的原始代码文件（Shell / Python 等）。
 
 ## 开发命令
 
