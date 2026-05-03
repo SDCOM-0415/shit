@@ -17,7 +17,7 @@ hero:
       link: https://github.com/SDCOM-0415/shit
 ---
 
-# Shell Scripts Collection
+# Scripts Collection
 
 这是一个我写的💩的集合，但是带有一点点实用性。
 

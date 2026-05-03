@@ -5,8 +5,8 @@ import { withPwa } from '@vite-pwa/vitepress'
 const baseUrl = 'https://shit.sdcom.top'
 
 export default withPwa(defineConfig({
-  title: "Shell脚本文档",
-  description: "Shell脚本集合的详细文档 - 提供 kill_app, linux_limit, get_ip 等常用 Shell 脚本的使用说明和示例",
+  title: "脚本文档",
+  description: "脚本集合（Shell / Python 等）的详细文档 - 提供各类脚本的使用说明和示例",
   head: [
     ['link', { rel: 'icon', href: '/image/favicon.ico', sizes: 'any' }],
     ['link', { rel: 'icon', href: '/image/logo.svg', type: 'image/svg+xml' }],
@@ -15,7 +15,7 @@ export default withPwa(defineConfig({
     ['meta', { name: 'theme-color', content: '#3E4E5D' }],
     // SEO 基础标签
     ['meta', { name: 'author', content: 'SDCOM' }],
-    ['meta', { name: 'keywords', content: 'Shell脚本,Linux脚本,Shell文档,脚本教程,kill_app,linux_limit,get_ip,docker管理' }],
+    ['meta', { name: 'keywords', content: '脚本,Linux脚本,脚本文档,脚本教程,kill_app,linux_limit,get_ip,docker管理,download_cbz_interactive' }],
     ['meta', { name: 'robots', content: 'index, follow' }],
     ['meta', { name: 'googlebot', content: 'index, follow' }],
     ['meta', { name: 'revisit-after', content: '7 days' }],
@@ -23,7 +23,7 @@ export default withPwa(defineConfig({
     ['meta', { name: 'language', content: 'zh-CN' }],
     // Open Graph 基础标签
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:site_name', content: 'Shell脚本文档' }],
+    ['meta', { property: 'og:site_name', content: '脚本文档' }],
     ['meta', { property: 'og:image', content: `${baseUrl}/image/logo.svg` }],
     ['meta', { property: 'og:image:width', content: '512' }],
     ['meta', { property: 'og:image:height', content: '512' }],
@@ -38,8 +38,8 @@ export default withPwa(defineConfig({
     root: {
       label: '中文',
       lang: 'zh-CN',
-      title: "Shell脚本文档",
-      description: "Shell脚本集合的详细文档",
+      title: "脚本文档",
+      description: "脚本集合的详细文档",
       themeConfig: {
         nav: [
           { text: '首页', link: '/' },
@@ -58,7 +58,8 @@ export default withPwa(defineConfig({
               { text: 'enable_docker.sh', link: '/scripts/enable_docker' },
               { text: 'fix_env.sh', link: '/scripts/fix_env' },
               { text: 'upload_to_box.sh', link: '/scripts/upload_to_box' },
-              { text: 'port_forward.sh', link: '/scripts/port_forward' }
+              { text: 'port_forward.sh', link: '/scripts/port_forward' },
+              { text: 'download_cbz_interactive.py', link: '/scripts/download_cbz_interactive' }
             ]
           }
         ],
@@ -75,8 +76,8 @@ export default withPwa(defineConfig({
     en: {
       label: 'English',
       lang: 'en',
-      title: "Shell Script Documentation",
-      description: "Detailed documentation for Shell script collection",
+      title: "Script Documentation",
+      description: "Detailed documentation for script collection",
       themeConfig: {
         nav: [
           { text: 'Home', link: '/en/' },
@@ -95,7 +96,8 @@ export default withPwa(defineConfig({
               { text: 'enable_docker.sh', link: '/en/scripts/enable_docker' },
               { text: 'fix_env.sh', link: '/en/scripts/fix_env' },
               { text: 'upload_to_box.sh', link: '/en/scripts/upload_to_box' },
-              { text: 'port_forward.sh', link: '/en/scripts/port_forward' }
+              { text: 'port_forward.sh', link: '/en/scripts/port_forward' },
+              { text: 'download_cbz_interactive.py', link: '/en/scripts/download_cbz_interactive' }
             ]
           }
         ],
@@ -112,8 +114,8 @@ export default withPwa(defineConfig({
     ja: {
       label: '日本語',
       lang: 'ja',
-      title: "Shell スクリプトドキュメンテーション",
-      description: "Shellスクリプトコレクションの詳細なドキュメント",
+      title: "スクリプトドキュメンテーション",
+      description: "スクリプトコレクションの詳細なドキュメント",
       themeConfig: {
         nav: [
           { text: 'ホーム', link: '/ja/' },
@@ -132,7 +134,8 @@ export default withPwa(defineConfig({
               { text: 'enable_docker.sh', link: '/ja/scripts/enable_docker' },
               { text: 'fix_env.sh', link: '/ja/scripts/fix_env' },
               { text: 'upload_to_box.sh', link: '/ja/scripts/upload_to_box' },
-              { text: 'port_forward.sh', link: '/ja/scripts/port_forward' }
+              { text: 'port_forward.sh', link: '/ja/scripts/port_forward' },
+              { text: 'download_cbz_interactive.py', link: '/ja/scripts/download_cbz_interactive' }
             ]
           }
         ],
@@ -168,8 +171,8 @@ export default withPwa(defineConfig({
   // 动态生成每个页面的 SEO 标签
   transformHead: ({ pageData, title, description }) => {
     const canonicalUrl = `${baseUrl}${pageData.relativePath.replace(/((^|\/)index)?\.md$/, '$2')}`
-    const pageTitle = title || pageData.title || "Shell脚本文档"
-    const pageDescription = description || pageData.description || "Shell脚本集合的详细文档"
+    const pageTitle = title || pageData.title || "脚本文档"
+    const pageDescription = description || pageData.description || "脚本集合的详细文档"
     const pageLang = pageData.lang || 'zh-CN'
     
     // 判断页面类型
