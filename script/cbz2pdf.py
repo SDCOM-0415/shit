@@ -43,6 +43,7 @@ import argparse
 import platform
 import subprocess
 import threading
+import importlib
 from io import BytesIO
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -158,17 +159,27 @@ def check_and_install_dependencies():
 
     if all_ok:
         print(f"\n  {SYM_OK} 所有依赖安装完成")
-        return True
+        # 安装后验证能否实际导入
+        for import_name, pip_name, _ in missing:
+            try:
+                importlib.import_module(import_name)
+            except ImportError:
+                print(f"  {SYM_WARN} {pip_name} 已安装但无法导入，可能需要重启脚本")
+                print(f"  请尝试: {sys.executable} {os.path.abspath(sys.argv[0])}")
+                all_ok = False
+                break
     else:
         print(f"\n  {SYM_FAIL} 部分依赖安装失败，请手动安装后重试")
-        return False
+
+    return all_ok
 
 
 # 在导入第三方库之前先检查依赖
 if not check_and_install_dependencies():
     sys.exit(1)
 
-from PIL import Image
+# 动态导入: 安装后 importlib 可立即加载，无需重启脚本
+Image = importlib.import_module("PIL.Image")
 
 
 # ============================================================
@@ -201,7 +212,21 @@ def collect_cbz_files(path):
     return []
 
 
-def cbz_to_pdf(cbz_path, output_path):
+def clean_path(path_str):
+    """清理用户输入的路径字符串
+    - 去除首尾引号
+    - 展开波浪号 (~)
+    - 去除 shell 转义反斜杠 (如 'folder\\ name' → 'folder name')
+    """
+    path_str = path_str.strip()
+    path_str = path_str.strip('"').strip("'")
+    path_str = os.path.expanduser(path_str)
+    # 去除 shell 转义: \空格 → 空格, \换行 → 忽略
+    path_str = path_str.replace('\\ ', ' ')
+    return path_str
+
+
+
     """
     将单个 CBZ 文件转换为 PDF (无页边距，图片尺寸即页面尺寸)
     直接构建 PDF 二进制流，每页 MediaBox 精确等于图片尺寸，零边距
@@ -450,9 +475,7 @@ def main():
             print(f"【输入路径】命令行指定: {os.path.abspath(input_path)}")
             new_input = input("  输入新路径可修改，回车确认: ").strip()
             if new_input:
-                new_input = new_input.strip('"').strip("'")
-                new_input = os.path.expanduser(new_input)
-                input_path = new_input
+                input_path = clean_path(new_input)
     else:
         print("【输入路径】")
         print("  请输入 CBZ 文件路径或包含 CBZ 文件的文件夹路径")
@@ -460,8 +483,7 @@ def main():
         if not input_path:
             print(f"  {SYM_FAIL} 未输入路径")
             return
-        input_path = input_path.strip('"').strip("'")
-        input_path = os.path.expanduser(input_path)
+        input_path = clean_path(input_path)
 
     input_path = os.path.abspath(input_path)
     if not os.path.exists(input_path):
@@ -486,9 +508,7 @@ def main():
             print(f"\n【输出目录】命令行指定: {os.path.abspath(output_dir)}")
             new_output = input("  输入新路径可修改，回车确认: ").strip()
             if new_output:
-                new_output = new_output.strip('"').strip("'")
-                new_output = os.path.expanduser(new_output)
-                output_dir = new_output
+                output_dir = clean_path(new_output)
     else:
         print(f"\n【输出目录】")
         print("  请输入 PDF 文件的保存目录")
@@ -496,9 +516,7 @@ def main():
         if not output_input:
             print(f"  {SYM_FAIL} 未指定输出目录")
             return
-        output_input = output_input.strip('"').strip("'")
-        output_input = os.path.expanduser(output_input)
-        output_dir = output_input
+        output_dir = clean_path(output_input)
 
     try:
         output_dir = os.path.abspath(output_dir)
