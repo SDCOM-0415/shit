@@ -14,6 +14,7 @@
 - [upload_to_box.sh](./upload_to_box.sh) - ファイルをファイルクーリアにアップロードするスクリプト
 - [port_forward.sh](./port_forward.md) - IPsec VPNポート転送管理ツール
 - [download_cbz_interactive.py](./download_cbz_interactive.md) - cloudme.one漫画チャプターダウンロードツール
+- [cbz2pdf.py](./cbz2pdf.md) - CBZ漫画アーカイブPDF変換ツール
 
 ## これらのスクリプトの使い方
 

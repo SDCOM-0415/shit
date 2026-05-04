@@ -14,6 +14,7 @@
 - [upload_to_box.sh](./upload_to_box.md) - 上传文件到文件快递柜的脚本
 - [port_forward.sh](./port_forward.md) - IPsec VPN端口转发管理工具
 - [download_cbz_interactive.py](./download_cbz_interactive.md) - cloudme.one漫画章节下载工具
+- [cbz2pdf.py](./cbz2pdf.md) - CBZ漫画档案转PDF转换工具
 
 ## 如何使用这些脚本
 

@@ -14,6 +14,7 @@ This contains detailed documentation for all scripts, including purpose, usage, 
 - [upload_to_box.sh](./upload_to_box.md) - Script to upload files to file courier
 - [port_forward.sh](./port_forward.md) - IPsec VPN port forwarding management tool
 - [download_cbz_interactive.py](./download_cbz_interactive.md) - cloudme.one manga chapter download tool
+- [cbz2pdf.py](./cbz2pdf.md) - CBZ comic archive to PDF conversion tool
 
 ## How to Use These Scripts
 
