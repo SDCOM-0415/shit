@@ -43,8 +43,6 @@ import argparse
 import platform
 import subprocess
 import threading
-import importlib
-from io import BytesIO
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -159,27 +157,17 @@ def check_and_install_dependencies():
 
     if all_ok:
         print(f"\n  {SYM_OK} 所有依赖安装完成")
-        # 安装后验证能否实际导入
-        for import_name, pip_name, _ in missing:
-            try:
-                importlib.import_module(import_name)
-            except ImportError:
-                print(f"  {SYM_WARN} {pip_name} 已安装但无法导入，可能需要重启脚本")
-                print(f"  请尝试: {sys.executable} {os.path.abspath(sys.argv[0])}")
-                all_ok = False
-                break
+        return True
     else:
         print(f"\n  {SYM_FAIL} 部分依赖安装失败，请手动安装后重试")
-
-    return all_ok
+        return False
 
 
 # 在导入第三方库之前先检查依赖
 if not check_and_install_dependencies():
     sys.exit(1)
 
-# 动态导入: 安装后 importlib 可立即加载，无需重启脚本
-Image = importlib.import_module("PIL.Image")
+from PIL import Image
 
 
 # ============================================================
@@ -212,24 +200,9 @@ def collect_cbz_files(path):
     return []
 
 
-def clean_path(path_str):
-    """清理用户输入的路径字符串
-    - 去除首尾引号
-    - 展开波浪号 (~)
-    - 去除 shell 转义反斜杠 (如 'folder\\ name' → 'folder name')
+def cbz_to_pdf(cbz_path, output_path, progress_callback=None):
     """
-    path_str = path_str.strip()
-    path_str = path_str.strip('"').strip("'")
-    path_str = os.path.expanduser(path_str)
-    # 去除 shell 转义: \空格 → 空格, \换行 → 忽略
-    path_str = path_str.replace('\\ ', ' ')
-    return path_str
-
-
-def cbz_to_pdf(cbz_path, output_path):
-    """
-    将单个 CBZ 文件转换为 PDF (无页边距，图片尺寸即页面尺寸)
-    直接构建 PDF 二进制流，每页 MediaBox 精确等于图片尺寸，零边距
+    将单个 CBZ 文件转换为 PDF
     返回 (True, output_path) 或 (False, error_message)
     """
     try:
@@ -244,54 +217,44 @@ def cbz_to_pdf(cbz_path, output_path):
             if not image_names:
                 return False, "CBZ 中未找到图片文件"
 
-            # 解码所有图片
-            # 对于原始 JPEG + RGB 图片，直接透传原始数据避免重复编码伪影
-            pages = []  # [(width, height, jpeg_bytes), ...]
-            for name in image_names:
+            images = []
+            total = len(image_names)
+
+            for i, name in enumerate(image_names):
                 try:
                     data = zf.read(name)
-                    img = Image.open(BytesIO(data))
-                    w, h = img.size
+                    img = Image.open(io_from_bytes(data))
 
-                    is_jpeg = name.lower().endswith(('.jpg', '.jpeg'))
-                    needs_reencode = False
-
-                    # 非 RGB 模式必须转换
-                    if img.mode != 'RGB':
-                        needs_reencode = True
+                    # 转换为 RGB (PDF 不支持 RGBA)
+                    if img.mode in ('RGBA', 'P', 'LA'):
+                        img = img.convert('RGB')
+                    elif img.mode != 'RGB':
                         img = img.convert('RGB')
 
-                    # 检查 EXIF 方向标签，非默认方向需要重新编码
-                    if not needs_reencode and is_jpeg:
-                        try:
-                            from PIL.ExifTags import Base as ExifBase
-                            exif = img.getexif()
-                            if exif and exif.get(ExifBase.Orientation, 1) != 1:
-                                needs_reencode = True
-                        except Exception:
-                            pass
-
-                    if is_jpeg and not needs_reencode:
-                        # 原始 JPEG + RGB + 无方向修正 → 直接透传，零质量损失
-                        jpeg_data = data
-                    else:
-                        # 非 JPEG 或需转换 → 编码为 JPEG
-                        buf = BytesIO()
-                        img.save(buf, format='JPEG', quality=95)
-                        jpeg_data = buf.getvalue()
-
-                    img.close()
-                    pages.append((w, h, jpeg_data))
+                    images.append(img)
                 except Exception:
-                    continue
+                    continue  # 跳过无法读取的图片
 
-            if not pages:
+                if progress_callback:
+                    progress_callback(i + 1, total)
+
+            if not images:
                 return False, "所有图片均无法读取"
 
-            # 直接构建 PDF 二进制 (零边距 + 出血防白边)
-            pdf_bytes = _build_pdf(pages)
-            with open(output_path, 'wb') as f:
-                f.write(pdf_bytes)
+            # 保存为 PDF
+            first_img = images[0]
+            rest = images[1:]
+
+            first_img.save(
+                output_path, 'PDF',
+                save_all=True,
+                append_images=rest,
+                resolution=150.0,
+            )
+
+            # 关闭所有图片释放内存
+            for img in images:
+                img.close()
 
             return True, output_path
 
@@ -301,119 +264,10 @@ def cbz_to_pdf(cbz_path, output_path):
         return False, str(e)
 
 
-def _build_pdf(pages):
-    """
-    直接构建 PDF 二进制流，零边距
-    pages: [(width_px, height_px, jpeg_bytes), ...]
-    每页 MediaBox 精确等于图片像素尺寸 (72 DPI)，无任何页边距
-    使用出血(bleed)技术：图片向外扩展 1pt，CropBox 裁切，消除抗锯齿白边
-    """
-    DPI = 72.0
-    BLEED = 1  # 出血量（点），图片向外扩展，确保边缘无白边
-    total_pages = len(pages)
-
-    # 预计算对象编号，避免使用占位符
-    # 对象顺序: N个图片 + N个内容流 + N个页面对象 + Pages + Catalog
-    pages_id = 3 * total_pages + 1   # Pages 节点对象编号
-    catalog_id = pages_id + 1        # Catalog 对象编号
-
-    pdf_parts = []
-    offsets = []
-    obj_num = 0
-
-    # PDF 文件头 (必须，阅读器靠此识别文件格式)
-    pdf_parts.append(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
-
-    def write_obj(content_bytes):
-        """写入一个 PDF 对象，返回对象编号"""
-        nonlocal obj_num
-        obj_num += 1
-        offset = sum(len(p) for p in pdf_parts)
-        offsets.append(offset)
-        header = f"{obj_num} 0 obj\n".encode('latin-1')
-        tail = b"\nendobj\n"
-        pdf_parts.append(header + content_bytes + tail)
-        return obj_num
-
-    img_ids = []
-    stream_ids = []
-    page_ids = []
-
-    # 1. 写入图片 XObject
-    for w_px, h_px, jpeg_data in pages:
-        header = (
-            f"<< /Type /XObject /Subtype /Image "
-            f"/Width {w_px} /Height {h_px} "
-            f"/ColorSpace /DeviceRGB /BitsPerComponent 8 "
-            f"/Filter /DCTDecode /Length {len(jpeg_data)} >>"
-            f"\nstream\n"
-        ).encode('latin-1')
-        img_id = write_obj(header + jpeg_data + b"\nendstream")
-        img_ids.append(img_id)
-
-    # 2. 写入每页的 Content Stream (绘制图片指令)
-    #    使用出血技术：图片从 (-BLEED, -BLEED) 绘制到 (w_pt+BLEED, h_pt+BLEED)
-    #    CropBox 裁切为 [0 0 w_pt h_pt]，确保边缘无白边
-    for i in range(total_pages):
-        w_px, h_px, _ = pages[i]
-        w_pt = int(w_px / DPI * 72)  # DPI=72 时 w_pt == w_px
-        h_pt = int(h_px / DPI * 72)
-        stream = (
-            f"q\n"
-            f"{w_pt + 2 * BLEED} 0 0 {h_pt + 2 * BLEED} {-BLEED} {-BLEED} cm\n"
-            f"/Im0 Do\nQ\n"
-        ).encode('latin-1')
-        stream_header = f"<< /Length {len(stream)} >>\nstream\n".encode('latin-1')
-        s_id = write_obj(stream_header + stream + b"\nendstream")
-        stream_ids.append(s_id)
-
-    # 3. 写入 Page 对象 (直接使用预计算的 pages_id，无需占位符)
-    #    添加 CropBox = MediaBox，确保阅读器裁切区域精确
-    for i in range(total_pages):
-        w_px, h_px, _ = pages[i]
-        w_pt = int(w_px / DPI * 72)
-        h_pt = int(h_px / DPI * 72)
-        page = (
-            f"<< /Type /Page "
-            f"/Parent {pages_id} 0 R "
-            f"/MediaBox [0 0 {w_pt} {h_pt}] "
-            f"/CropBox [0 0 {w_pt} {h_pt}] "
-            f"/Contents {stream_ids[i]} 0 R "
-            f"/Resources << /XObject << /Im0 {img_ids[i]} 0 R >> >> >>"
-        ).encode('latin-1')
-        p_id = write_obj(page)
-        page_ids.append(p_id)
-
-    # 4. Pages 对象
-    kids = " ".join(f"{pid} 0 R" for pid in page_ids)
-    pages_obj = f"<< /Type /Pages /Kids [{kids}] /Count {total_pages} >>".encode('latin-1')
-    pages_offset = sum(len(p) for p in pdf_parts)
-    offsets.append(pages_offset)
-    pdf_parts.append(f"{pages_id} 0 obj\n".encode('latin-1') + pages_obj + b"\nendobj\n")
-
-    # 5. Catalog 对象
-    catalog_offset = sum(len(p) for p in pdf_parts)
-    offsets.append(catalog_offset)
-    catalog_obj = f"<< /Type /Catalog /Pages {pages_id} 0 R >>".encode('latin-1')
-    pdf_parts.append(f"{catalog_id} 0 obj\n".encode('latin-1') + catalog_obj + b"\nendobj\n")
-
-    # 6. Cross-reference table
-    xref_offset = sum(len(p) for p in pdf_parts)
-    xref = b"xref\n"
-    xref += f"0 {catalog_id + 1}\n".encode('latin-1')
-    xref += b"0000000000 65535 f \n"
-    for off in offsets:
-        xref += f"{off:010d} 00000 n \n".encode('latin-1')
-    pdf_parts.append(xref)
-
-    # 7. Trailer
-    trailer = (
-        f"trailer\n<< /Size {catalog_id + 1} /Root {catalog_id} 0 R >>\n"
-        f"startxref\n{xref_offset}\n%%EOF\n"
-    ).encode('latin-1')
-    pdf_parts.append(trailer)
-
-    return b"".join(pdf_parts)
+def io_from_bytes(data):
+    """将 bytes 转为 BytesIO 对象"""
+    from io import BytesIO
+    return BytesIO(data)
 
 
 def format_output_name(cbz_path, name_format, index, output_dir):
@@ -475,7 +329,9 @@ def main():
             print(f"【输入路径】命令行指定: {os.path.abspath(input_path)}")
             new_input = input("  输入新路径可修改，回车确认: ").strip()
             if new_input:
-                input_path = clean_path(new_input)
+                new_input = new_input.strip('"').strip("'")
+                new_input = os.path.expanduser(new_input)
+                input_path = new_input
     else:
         print("【输入路径】")
         print("  请输入 CBZ 文件路径或包含 CBZ 文件的文件夹路径")
@@ -483,7 +339,8 @@ def main():
         if not input_path:
             print(f"  {SYM_FAIL} 未输入路径")
             return
-        input_path = clean_path(input_path)
+        input_path = input_path.strip('"').strip("'")
+        input_path = os.path.expanduser(input_path)
 
     input_path = os.path.abspath(input_path)
     if not os.path.exists(input_path):
@@ -508,7 +365,9 @@ def main():
             print(f"\n【输出目录】命令行指定: {os.path.abspath(output_dir)}")
             new_output = input("  输入新路径可修改，回车确认: ").strip()
             if new_output:
-                output_dir = clean_path(new_output)
+                new_output = new_output.strip('"').strip("'")
+                new_output = os.path.expanduser(new_output)
+                output_dir = new_output
     else:
         print(f"\n【输出目录】")
         print("  请输入 PDF 文件的保存目录")
@@ -516,7 +375,9 @@ def main():
         if not output_input:
             print(f"  {SYM_FAIL} 未指定输出目录")
             return
-        output_dir = clean_path(output_input)
+        output_input = output_input.strip('"').strip("'")
+        output_input = os.path.expanduser(output_input)
+        output_dir = output_input
 
     try:
         output_dir = os.path.abspath(output_dir)
