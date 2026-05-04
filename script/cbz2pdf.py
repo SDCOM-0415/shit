@@ -226,7 +226,7 @@ def clean_path(path_str):
     return path_str
 
 
-
+def cbz_to_pdf(cbz_path, output_path):
     """
     将单个 CBZ 文件转换为 PDF (无页边距，图片尺寸即页面尺寸)
     直接构建 PDF 二进制流，每页 MediaBox 精确等于图片尺寸，零边距
@@ -681,7 +681,7 @@ def main():
 
     # ==================== 结果 ====================
     print(f"\n{'=' * 56}")
-    print(f"  转换完成!")
+    print(f"  转换结束!")
     print(f"  成功: {success}  跳过: {skipped}  失败: {fail}")
     print(f"  文件保存在: {output_dir}")
     print(f"{'=' * 56}")
