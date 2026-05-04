@@ -26,14 +26,12 @@
 
 ## 依赖
 
-- Python 3.6+
-- curl_cffi
+| 依赖 | 用途 | 安装 |
+|------|------|------|
+| Python 3.6+ | 运行环境 | — |
+| [curl_cffi](https://pypi.org/project/curl-cffi) | 绕过 Cloudflare 保护，下载图片 | `pip install curl_cffi` |
 
-```bash
-pip install curl_cffi
-```
-
-脚本首次运行时会自动检测依赖，缺失时提示自动安装。
+> 脚本首次运行时会自动检测依赖，缺失时提示自动安装。
 
 ## 使用方法
 

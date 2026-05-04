@@ -26,14 +26,12 @@ This is a Python script for downloading manga chapters from cloudme.one and pack
 
 ## Dependencies
 
-- Python 3.6+
-- curl_cffi
+| Dependency | Purpose | Install |
+|-----------|---------|---------|
+| Python 3.6+ | Runtime environment | — |
+| [curl_cffi](https://pypi.org/project/curl-cffi) | Bypass Cloudflare protection, download images | `pip install curl_cffi` |
 
-```bash
-pip install curl_cffi
-```
-
-The script automatically detects dependencies on first run and prompts to install if missing.
+> The script automatically detects dependencies on first run and prompts to install if missing.
 
 ## Usage
 

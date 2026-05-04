@@ -15,7 +15,7 @@ export default withPwa(defineConfig({
     ['meta', { name: 'theme-color', content: '#3E4E5D' }],
     // SEO 基础标签
     ['meta', { name: 'author', content: 'SDCOM' }],
-    ['meta', { name: 'keywords', content: '脚本,Linux脚本,脚本文档,脚本教程,kill_app,linux_limit,get_ip,docker管理,download_cbz_interactive' }],
+    ['meta', { name: 'keywords', content: '脚本,Linux脚本,脚本文档,脚本教程,kill_app,linux_limit,get_ip,docker管理,download_cbz_interactive,cbz2pdf' }],
     ['meta', { name: 'robots', content: 'index, follow' }],
     ['meta', { name: 'googlebot', content: 'index, follow' }],
     ['meta', { name: 'revisit-after', content: '7 days' }],
@@ -59,7 +59,8 @@ export default withPwa(defineConfig({
               { text: 'fix_env.sh', link: '/scripts/fix_env' },
               { text: 'upload_to_box.sh', link: '/scripts/upload_to_box' },
               { text: 'port_forward.sh', link: '/scripts/port_forward' },
-              { text: 'download_cbz_interactive.py', link: '/scripts/download_cbz_interactive' }
+              { text: 'download_cbz_interactive.py', link: '/scripts/download_cbz_interactive' },
+              { text: 'cbz2pdf.py', link: '/scripts/cbz2pdf' }
             ]
           }
         ],
@@ -97,7 +98,8 @@ export default withPwa(defineConfig({
               { text: 'fix_env.sh', link: '/en/scripts/fix_env' },
               { text: 'upload_to_box.sh', link: '/en/scripts/upload_to_box' },
               { text: 'port_forward.sh', link: '/en/scripts/port_forward' },
-              { text: 'download_cbz_interactive.py', link: '/en/scripts/download_cbz_interactive' }
+              { text: 'download_cbz_interactive.py', link: '/en/scripts/download_cbz_interactive' },
+              { text: 'cbz2pdf.py', link: '/en/scripts/cbz2pdf' }
             ]
           }
         ],
@@ -135,7 +137,8 @@ export default withPwa(defineConfig({
               { text: 'fix_env.sh', link: '/ja/scripts/fix_env' },
               { text: 'upload_to_box.sh', link: '/ja/scripts/upload_to_box' },
               { text: 'port_forward.sh', link: '/ja/scripts/port_forward' },
-              { text: 'download_cbz_interactive.py', link: '/ja/scripts/download_cbz_interactive' }
+              { text: 'download_cbz_interactive.py', link: '/ja/scripts/download_cbz_interactive' },
+              { text: 'cbz2pdf.py', link: '/ja/scripts/cbz2pdf' }
             ]
           }
         ],

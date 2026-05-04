@@ -26,14 +26,12 @@
 
 ## 依存関係
 
-- Python 3.6+
-- curl_cffi
+| 依存関係 | 用途 | インストール |
+|---------|------|-------------|
+| Python 3.6+ | 実行環境 | — |
+| [curl_cffi](https://pypi.org/project/curl-cffi) | Cloudflare保護をバイパスして画像をダウンロード | `pip install curl_cffi` |
 
-```bash
-pip install curl_cffi
-```
-
-スクリプトの初回実行時に依存関係を自動検出し、不足している場合はインストールを案内します。
+> スクリプトの初回実行時に依存関係を自動検出し、不足している場合はインストールを案内します。
 
 ## 使用方法
 
