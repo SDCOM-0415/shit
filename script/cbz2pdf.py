@@ -65,6 +65,18 @@ def setup_windows_console():
         pass
 
 
+def unescape_shell_path(path):
+    """去除路径中的 shell 转义字符 (如 \\空格 → 空格)
+
+    macOS/Linux 终端中输入路径时，常用反斜杠转义空格等特殊字符，
+    但 Python 的 input() 不会处理这些转义，导致路径查找失败。
+    Windows 下反斜杠是路径分隔符，不做处理。
+    """
+    if IS_WINDOWS:
+        return path
+    return re.sub(r'\\(.)', r'\1', path)
+
+
 def safe_filename(title):
     """将标题转换为当前系统安全的文件名"""
     if IS_WINDOWS:
@@ -331,6 +343,7 @@ def main():
             if new_input:
                 new_input = new_input.strip('"').strip("'")
                 new_input = os.path.expanduser(new_input)
+                new_input = unescape_shell_path(new_input)
                 input_path = new_input
     else:
         print("【输入路径】")
@@ -341,6 +354,7 @@ def main():
             return
         input_path = input_path.strip('"').strip("'")
         input_path = os.path.expanduser(input_path)
+        input_path = unescape_shell_path(input_path)
 
     input_path = os.path.abspath(input_path)
     if not os.path.exists(input_path):
@@ -367,6 +381,7 @@ def main():
             if new_output:
                 new_output = new_output.strip('"').strip("'")
                 new_output = os.path.expanduser(new_output)
+                new_output = unescape_shell_path(new_output)
                 output_dir = new_output
     else:
         print(f"\n【输出目录】")
@@ -377,6 +392,7 @@ def main():
             return
         output_input = output_input.strip('"').strip("'")
         output_input = os.path.expanduser(output_input)
+        output_input = unescape_shell_path(output_input)
         output_dir = output_input
 
     try:
@@ -542,7 +558,7 @@ def main():
 
     # ==================== 结果 ====================
     print(f"\n{'=' * 56}")
-    print(f"  转换结束!")
+    print(f"  转换完成!")
     print(f"  成功: {success}  跳过: {skipped}  失败: {fail}")
     print(f"  文件保存在: {output_dir}")
     print(f"{'=' * 56}")
