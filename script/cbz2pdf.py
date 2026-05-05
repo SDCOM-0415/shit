@@ -169,6 +169,10 @@ def check_and_install_dependencies():
 
     if all_ok:
         print(f"\n  {SYM_OK} 所有依赖安装完成")
+        import importlib
+        importlib.invalidate_caches()
+        import site
+        site.main()
         return True
     else:
         print(f"\n  {SYM_FAIL} 部分依赖安装失败，请手动安装后重试")
