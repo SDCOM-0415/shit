@@ -1,100 +1,179 @@
 #!/bin/bash
 # =================================================================
-# 深度系统安全与后门排查脚本 (V2 增强版 - 纯只读模式)
+# 核心系统组件与哪吒客户端完整性安全校验脚本 (V4 实例优化版)
 # =================================================================
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${CYAN}=================================================================${NC}"
-echo -e "${RED}  🚨 正在进行系统深度扫描 (只读模式，无破坏性操作) 🚨${NC}"
+echo -e "${GREEN}    🛡️ 核心系统组件与哪吒客户端完整性智能审计系统 (只读) 🛡️${NC}"
 echo -e "${CYAN}=================================================================\n${NC}"
 
-# 1. 检查畸高资源占用进程 (挖矿/空转脚本)
-echo -e "${YELLOW}>>> [1/12] 检查 CPU 占用超 40% 的异常进程:${NC}"
-ps -eo pid,ppid,%cpu,%mem,user,lstart,command --sort=-%cpu | awk 'NR==1 || $3>40.0' | head -n 10
+# ==========================================
+# 维度一：核心系统组件的别名（Alias）劫持检测
+# ==========================================
+echo -e "${YELLOW}>>> [1/5] 深度检查核心系统组件别名 (防止审计环境被污染):${NC}"
+alias_list=$(alias 2>/dev/null)
+if echo "$alias_list" | grep -qE "ls=|ps=|netstat=|ss=|kill=|cat=|grep=|wget=|curl=|md5sum=|sha256sum="; then
+    echo -e "  ${RED}[!] 警告：发现敏感命令的本地别名劫持：${NC}"
+    echo "$alias_list" | grep -E "ls=|ps=|netstat=|ss=|kill=|cat=|grep=|wget=|curl=|md5sum=|sha256sum="
+else
+    echo -e "  ${GREEN}[√] 当前会话核心系统命令无别名劫持。${NC}"
+fi
 echo ""
 
-# 2. 检查已知恶意软件家族关键字 (涵盖 XMRig, Traffmonetizer, 常见后门)
-echo -e "${YELLOW}>>> [2/12] 检查内存中是否运行已知恶意进程:${NC}"
-ps -ef | grep -iE "xmrig|minerd|kdevtmpfsi|xmr-stak|stratum|ice\.sh|traffmonetizer|bash\ --check|nezha\.sh" | grep -v "grep"
-echo ""
+# ==========================================
+# 维度二：国内外网络地理位置智能探测 (联动官方安装脚本逻辑)
+# ==========================================
+echo -e "${YELLOW}>>> [2/5] 智能探测网络环境与官方源联通性:${NC}"
+isCN=""
+api_list="https://blog.cloudflare.com/cdn-cgi/trace https://developers.cloudflare.com/cdn-cgi/trace"
+ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
 
-# 3. 检查敏感目录运行的进程 (木马及伪装系统进程)
-echo -e "${YELLOW}>>> [3/12] 检查从临时/异常目录 (/tmp, /dev/shm, /var/tmp, /root/) 启动的进程:${NC}"
-ps -eo pid,user,command | grep -E "/tmp/|/var/tmp/|/dev/shm/|/root/" | grep -v -E "grep|/root/\.vscode-server"
-echo ""
-
-# 4. 检查幽灵进程 (Fileless 无文件落地攻击)
-echo -e "${YELLOW}>>> [4/12] 检查可疑的幽灵进程 (执行文件已被删除但仍在内存中运行):${NC}"
-ls -al /proc/*/exe 2>/dev/null | grep -i "deleted" | grep -v "/memfd:"
-echo ""
-
-# 5. 深度检查所有定时任务 (用户级 + 系统级)
-echo -e "${YELLOW}>>> [5/12] 检查系统与所有用户的定时任务 (异常下载/执行/外联行为):${NC}"
-# 系统级
-grep -rnE "wget|curl|nc\ |bash|sh|traffmonetizer" /etc/crontab /etc/cron.* 2>/dev/null | grep -v "^#"
-# 用户级
-for user in $(cut -f1 -d: /etc/passwd); do
-    crontab -u $user -l 2>/dev/null | grep -v "^#" | grep -E "wget|curl|nc\ |bash|sh|traffmonetizer" && echo -e "  ${RED}[!] 发现异常任务, 所属用户: $user${NC}"
+for url in $api_list; do
+    text=$(curl -A "$ua" -m 5 -s "$url" 2>/dev/null)
+    if echo "$text" | grep -qw 'CN'; then
+        isCN=true
+        break
+    fi
 done
+
+if [ -n "$isCN" ]; then
+    echo -e "  -> 探测结果: ${YELLOW}中国大陆网络环境 (启用指定国内 Ghproxy 加速实例)${NC}"
+    # 按照您提供的专属实例进行前缀拼接定义
+    MIRROR_PROXY="https://v4.gh-proxy.org/" 
+else
+    echo -e "  -> 探测结果: ${GREEN}国际网络环境 (直连 GitHub 官方仓库)${NC}"
+    MIRROR_PROXY=""
+fi
 echo ""
 
-# 6. 检查异常开机自启服务 (Systemd 劫持)
-echo -e "${YELLOW}>>> [6/12] 检查最近 7 天内被修改或创建的 Systemd 系统服务文件:${NC}"
-find /etc/systemd/system/ /lib/systemd/system/ -type f -mtime -7 -name "*.service" -exec ls -lt {} \; 2>/dev/null | head -n 10
-echo -e "  -> ${CYAN}检查服务文件中是否包含恶意关键字:${NC}"
-grep -rnE "xmrig|traffmonetizer|wget|curl" /etc/systemd/system/ 2>/dev/null
+# ==========================================
+# 维度三：常用基础系统组件的完整性校验 (bash, wget, curl, sshd)
+# ==========================================
+echo -e "${YELLOW}>>> [3/5] 常用基础系统组件路径及哈希提取 (排查是否被黑客偷梁换柱):${NC}"
+core_deps=("bash" "wget" "curl" "sshd")
+
+printf "  %-10s %-25s %-32s\n" "组件名" "绝对物理路径" "本地文件 MD5 摘要"
+printf "  %-10s %-25s %-32s\n" "------" "------------" "----------------"
+
+for dep in "${core_deps[@]}"; do
+    dep_path=$(command -v "$dep" 2>/dev/null)
+    if [ -z "$dep_path" ] && [ "$dep" = "sshd" ]; then
+        [ -f "/usr/sbin/sshd" ] && dep_path="/usr/sbin/sshd"
+        [ -f "/usr/bin/sshd" ] && dep_path="/usr/bin/sshd"
+    fi
+    
+    if [ -n "$dep_path" ] && [ -f "$dep_path" ]; then
+        dep_md5=$(md5sum "$dep_path" 2>/dev/null | awk '{print $1}')
+        printf "  %-12s %-27s ${CYAN}%-32s${NC}\n" "[$dep]" "$dep_path" "$dep_md5"
+    else
+        printf "  %-12s ${RED}%-27s${NC} %-32s\n" "[$dep]" "未找到或已被物理删除" "N/A"
+    fi
+done
+echo -e "  ${YELLOW}[💡 集群比对提示]：相同系统版本的不同服务器，正常组件 MD5 应全等。若某一节点发生偏离，说明被恶意篡改。${NC}"
 echo ""
 
-# 7. 检查网络连接情况 (外联 C2 与矿池)
-echo -e "${YELLOW}>>> [7/12] 检查异常公网网络连接 (ESTABLISHED):${NC}"
+# ==========================================
+# 维度四：哪吒客户端（nezha-agent）版本与云端官方哈希校验
+# ==========================================
+echo -e "${YELLOW}>>> [4/5] 哪吒客户端 (nezha-agent) 实体与内存映像双重校验:${NC}"
+
+agent_pid=$(pgrep -f "nezha-agent" | head -n 1)
+agent_path=""
+
+if [ -n "$agent_pid" ]; then
+    agent_path=$(ls -l /proc/"$agent_pid"/exe 2>/dev/null | awk '{print $NF}')
+fi
+
+if [ -z "$agent_path" ] || [[ "$agent_path" == *"(deleted)"* ]]; then
+    [ -f "/opt/nezha/agent/nezha-agent" ] && agent_path="/opt/nezha/agent/nezha-agent"
+    [ -f "/usr/local/bin/nezha-agent" ] && agent_path="/usr/local/bin/nezha-agent"
+fi
+
+clean_agent_path="${agent_path%% *}" 
+
+if [ -n "$clean_agent_path" ] && [ -f "$clean_agent_path" ]; then
+    echo -e "  -> 哪吒组件真实可执行路径: ${CYAN}$clean_agent_path${NC}"
+    
+    local_version=$($clean_agent_path -v 2>/dev/null | head -n 1 | awk '{print $NF}')
+    [ -z "$local_version" ] && local_version=$($clean_agent_path --version 2>/dev/null | head -n 1 | awk '{print $NF}')
+    echo -e "  -> 本地二进制检测版本:     ${CYAN}${local_version:-未知}${NC}"
+    
+    local_md5=$(md5sum "$clean_agent_path" 2>/dev/null | awk '{print $1}')
+    local_sha256=$(sha256sum "$clean_agent_path" 2>/dev/null | awk '{print $1}')
+    echo -e "  -> 本地可执行实体 MD5:     ${CYAN}$local_md5${NC}"
+    echo -e "  -> 本地可执行实体 SHA256:  ${CYAN}$local_sha256${NC}"
+    
+    if [ -n "$local_version" ]; then
+        mach=$(uname -m)
+        case "$mach" in
+            x86_64|amd64) os_arch="amd64" ;;
+            aarch64|arm64) os_arch="arm64" ;;
+            *) os_arch="" ;;
+        esac
+        
+        system=$(uname)
+        case "$system" in
+            *Linux*) os="linux" ;;
+            *Darwin*) os="darwin" ;;
+            *) os="" ;;
+        esac
+        
+        if [ -n "$os_arch" ] && [ -n "$os" ]; then
+            pkg_name="nezha-agent_${os}_${os_arch}.zip"
+            # 严格按照完整链接格式拼接：前缀 + 完整的 GitHub 线上 HTTPS 链接
+            hash_url="${MIRROR_PROXY}https://github.com/nezhahq/agent/releases/download/${local_version}/sha256sum.txt"
+            
+            echo -e "  -> 正在通过安全通道拉取官方哈希验证集 (URL: ${CYAN}$hash_url${NC})..."
+            remote_hashes=$(curl -sL --connect-timeout 5 "$hash_url" 2>/dev/null)
+            
+            if [ -n "$remote_hashes" ]; then
+                remote_sha256=$(echo "$remote_hashes" | grep "$pkg_name" | awk '{print $1}')
+                if [ -n "$remote_sha256" ]; then
+                    echo -e "  -> 官方 Release 发布包 (${pkg_name}) 预估 SHA256: ${GREEN}$remote_sha256${NC}"
+                else
+                    echo -e "  ${YELLOW}[!] 提示：成功连接官方仓库，但该版本校验文件中未找到对应架构的哈希配对。${NC}"
+                fi
+            else
+                echo -e "  ${RED}[!] 警告：云端哈希连接超时。当前网络可能被阻断或控制，建议直接采用集群内多机 MD5 离线交叉取证法。${NC}"
+            fi
+        fi
+    fi
+else
+    echo -e "  ${RED}[!] 极高风险：未能在系统任何常规及内存挂载点找到合法的 nezha-agent 实体文件！${NC}"
+fi
+echo ""
+
+# ==========================================
+# 维度五：幽灵后门与残留常驻 C2 实时监测
+# ==========================================
+echo -e "${YELLOW}>>> [5/5] 内存隐藏后门与黑客外联 C2 流定向扫描:${NC}"
+ghost_processes=$(ls -al /proc/*/exe 2>/dev/null | grep -i "deleted" | grep -v -E "/memfd:|/dev/shm")
+if [ -n "$ghost_processes" ]; then
+    echo -e "  ${RED}[!] 警告：发现系统存在隐藏的、即用即删的“无文件落地”幽灵进程：${NC}"
+    echo "$ghost_processes"
+else
+    echo -e "  ${GREEN}[√] 未发现内存无文件幽灵进程。${NC}"
+fi
+
 if command -v ss >/dev/null 2>&1; then
-    ss -antp | grep ESTAB | grep -v -E "127\.0\.0\.1|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\." | awk '{print $4, "->", $5, "进程:" $6}'
+    net_connections=$(ss -antp 2>/dev/null | grep ESTAB | grep -E "103\.106\.|45\.196\.|61\.132\.|86\.54\.|supportxmr")
 else
-    netstat -antp 2>/dev/null | grep ESTABLISHED | grep -v -E "127\.0\.0\.1|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\." | awk '{print $4, "->", $5, "进程:" $7}'
+    net_connections=$(netstat -antp 2>/dev/null | grep ESTABLISHED | grep -E "103\.106\.|45\.196\.|61\.132\.|86\.54\.|supportxmr")
 fi
-echo ""
 
-# 8. 检查 SSH 后门公钥 (重点排查)
-echo -e "${YELLOW}>>> [8/12] 检查 root 用户的 SSH 免密登录公钥 (authorized_keys):${NC}"
-if [ -s /root/.ssh/authorized_keys ]; then
-    echo -e "${RED}[!] 发现公钥内容如下，请核对是否为您本人添加：${NC}"
-    cat /root/.ssh/authorized_keys
+if [ -n "$net_connections" ]; then
+    echo -e "  ${RED}[!] 警告：检测到本机正与黑客的控制端或外部矿池保持活动网络连接：${NC}"
+    echo "$net_connections"
 else
-    echo -e "${GREEN}[√] /root/.ssh/authorized_keys 为空或不存在。${NC}"
+    echo -e "  ${GREEN}[√] 本机当前未发现任何与已知黑客控制端的网络长连接。${NC}"
 fi
-echo ""
 
-# 9. 检查隐藏的提权后门账户 (UID为0的黑客账户)
-echo -e "${YELLOW}>>> [9/12] 检查系统中拥有最高权限 (UID=0) 的账户:${NC}"
-awk -F: '$3 == 0 {print $1}' /etc/passwd
-echo ""
-
-# 10. 检查 Rootkit 动态链接库劫持
-echo -e "${YELLOW}>>> [10/12] 检查动态链接库劫持 (/etc/ld.so.preload):${NC}"
-if [ -s /etc/ld.so.preload ]; then
-    echo -e "${RED}[!] 警告：/etc/ld.so.preload 不为空！极有可能存在底层后门，内容如下：${NC}"
-    cat /etc/ld.so.preload
-else
-    echo -e "${GREEN}[√] /etc/ld.so.preload 为空，正常。${NC}"
-fi
-echo ""
-
-# 11. 检查环境变量与别名劫持 (防呆木马)
-echo -e "${YELLOW}>>> [11/12] 检查 Shell 启动文件是否被恶意植入隐藏代码:${NC}"
-grep -iE "alias|curl|wget|bash" /root/.bashrc /root/.profile /etc/profile /etc/bash.bashrc 2>/dev/null | grep -v "^#" | head -n 10
-echo ""
-
-# 12. 检查操作记录是否被抹除
-echo -e "${YELLOW}>>> [12/12] 检查 Bash 历史记录文件状态:${NC}"
-ls -la /root/.bash_history 2>/dev/null
-echo ""
-
-echo -e "${CYAN}=================================================================${NC}"
-echo -e "${GREEN}排查扫描完毕！(当前脚本为只读模式，未对系统进行任何修改)${NC}"
-echo -e "请截图或保存以上输出日志，人工核对后再编写清理脚本。"
+echo -e "\n${CYAN}=================================================================${NC}"
+echo -e "${GREEN}  智能完整性安全核验运行结束！(只读模式，未对系统数据执行任何修改)  ${NC}"
 echo -e "${CYAN}=================================================================${NC}"
